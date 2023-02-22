@@ -20,4 +20,3 @@ from typing import (Literal)
 ROLE_ENUM = Literal["admin", "manager", "user"]
 
 ROLE: str = "admin"
-

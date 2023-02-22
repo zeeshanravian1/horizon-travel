@@ -8,7 +8,7 @@
 """
 
 # Importing Python packages
-from sqlalchemy import (select, func)
+from sqlalchemy import (select, func, and_)
 from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
@@ -19,8 +19,6 @@ from flask import (Blueprint, request)
 from database.session import (get_session)
 from .exception import (ROLE_NOT_FOUND)
 from .model import (RoleTable)
-from .schema import (RoleCreateSchema, RoleReadSchema,
-                     RolePaginationReadSchema, RoleUpdateSchema)
 from ..base import (CONTENT_TYPE)
 
 
@@ -35,7 +33,9 @@ role_router = Blueprint(
 
 
 @role_router.post("/")
-def create_role(db_session: Session = get_session()):
+def create_role(
+    db_session: Session = get_session()
+):
     """
         Create a single role.
 
@@ -58,9 +58,7 @@ def create_role(db_session: Session = get_session()):
     print("Calling create_role method")
 
     try:
-        record = RoleCreateSchema(**request.json)
-
-        record = RoleTable(**record.dict())
+        record = RoleTable(**request.json)
 
         db_session.add(record)
         db_session.commit()
@@ -91,10 +89,10 @@ def create_role(db_session: Session = get_session()):
 
 
 # Get a single role route
-@role_router.get("/<int:role_id>")
+@role_router.get("/<int:role_id>/")
 def get_role(
     role_id: int, db_session: Session = get_session()
-) -> RoleReadSchema:
+):
     """
         Get a single role.
 
@@ -114,7 +112,10 @@ def get_role(
     """
     print("Calling get_role method")
 
-    query = select(RoleTable).where(RoleTable.id == role_id)
+    # Select role based on id and is deleted flag
+
+    query = select(RoleTable).where(and_(RoleTable.id == role_id,
+                                         RoleTable.is_deleted == False))
 
     record = db_session.execute(statement=query).scalar_one_or_none()
 
@@ -131,7 +132,7 @@ def get_role(
 def get_all_roles(
     page: int | None = 1, limit: int | None = 10,
     db_session: Session = get_session()
-) -> RolePaginationReadSchema:
+):
     """
         Get all roles.
 
@@ -152,15 +153,14 @@ def get_all_roles(
     """
     print("Calling get_all_roles method")
 
-    query = select(func.count(RoleTable.id))
+    query = select(func.count(RoleTable.id)).where(
+        RoleTable.is_deleted == False)
     result = db_session.execute(query)
     total_count = result.scalar()
 
-    print("total_count", total_count)
-
     if page and limit:
-        query = select(RoleTable).where(
-            RoleTable.id > (page - 1) * limit).limit(limit)
+        query = select(RoleTable).where(and_(
+            RoleTable.is_deleted == False, RoleTable.id > (page - 1) * limit)).limit(limit)
 
     result = db_session.execute(query).scalars().all()
 
@@ -175,10 +175,10 @@ def get_all_roles(
 
 
 # Update a single role route
-@role_router.put("/<int:role_id>")
+@role_router.put("/<int:role_id>/")
 def update_role(
     role_id: int, db_session: Session = get_session()
-) -> RoleReadSchema:
+):
     """
         Update a single role.
 
@@ -203,9 +203,8 @@ def update_role(
     print("Calling update_role method")
 
     try:
-        record = RoleUpdateSchema(**request.json)
-
-        query = select(RoleTable).where(RoleTable.id == role_id)
+        query = select(RoleTable).where(and_(RoleTable.id == role_id,
+                                             RoleTable.is_deleted == False))
 
         result = db_session.execute(query).scalar_one_or_none()
 
@@ -213,7 +212,7 @@ def update_role(
             return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                     404, CONTENT_TYPE)
 
-        result.role_name = record.role_name
+        result.role_name = request.json.get("role_name", result.role_name)
 
         db_session.commit()
 
@@ -242,10 +241,10 @@ def update_role(
 
 
 # Delete a single role route
-@role_router.delete("/<int:role_id>")
+@role_router.delete("/<int:role_id>/")
 def delete_role(
     role_id: int, db_session: Session = get_session()
-) -> RoleReadSchema:
+):
     """
         Delete a single role.
 
@@ -265,7 +264,8 @@ def delete_role(
     """
     print("Calling delete_role method")
 
-    query = select(RoleTable).where(RoleTable.id == role_id)
+    query = select(RoleTable).where(and_(RoleTable.id == role_id,
+                                         RoleTable.is_deleted == False))
 
     result = db_session.execute(query).scalar_one_or_none()
 
@@ -273,8 +273,9 @@ def delete_role(
         return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
-    db_session.delete(result)
+    result.is_deleted = True
+
     db_session.commit()
 
-    return ({"success": True, "message": "Role deleted successfully", "data": result.to_dict()},
+    return ({"success": True, "message": "Role deleted successfully"},
             200, CONTENT_TYPE)
