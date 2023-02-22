@@ -18,10 +18,10 @@ from .connection import (engine)
 # --------------------------------------------------------------------------------------------------
 
 
-SessionLocal: Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal: Session = sessionmaker(autocommit=False, autoflush=True, bind=engine)
 
 
-async def get_session():
+def get_session():
     """
         Get session
 
@@ -40,7 +40,7 @@ async def get_session():
     session: Session = SessionLocal()
 
     try:
-        yield session
+        return session
 
     except Exception as err:
         session.rollback()

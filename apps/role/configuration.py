@@ -19,6 +19,5 @@ from typing import (Literal)
 
 ROLE_ENUM = Literal["admin", "manager", "user"]
 
-ID: int = 1
 ROLE: str = "admin"
-ROLE_DESCRIPTION: str = "Admin role description"
+

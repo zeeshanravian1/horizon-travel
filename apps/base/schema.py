@@ -44,4 +44,4 @@ class BasePaginationReadSchema(BaseModel):
     total: int = Field(example=TOTAL)
     page: int = Field(example=PAGE)
     limit: int = Field(example=LIMIT)
-    data: List = Field(example=[])
+    items: List = Field(example=[])

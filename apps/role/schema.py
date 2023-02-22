@@ -14,7 +14,7 @@ from pydantic import (BaseModel, Field)
 
 # Importing from project files
 from apps import (BaseReadSchema, BasePaginationReadSchema)
-from .configuration import (ROLE_ENUM, ID, ROLE, ROLE_DESCRIPTION)
+from .configuration import (ROLE_ENUM, ROLE)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -75,16 +75,6 @@ class RolePaginationReadSchema(BasePaginationReadSchema):
 
 
 class RoleUpdateSchema(RoleCreateSchema):
-    """
-        Role Update Schema
-
-        Description:
-        - This schema is used to validate role update data passed to API.
-
-    """
-
-
-class RolePartialUpdateSchema(RoleBaseSchema):
     """
         Role Update Schema
 

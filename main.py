@@ -7,104 +7,90 @@
 
 """
 
+# Importing Python packages
+
+# Importing Flask packages
 from flask import Flask
-from flask_restful import Resource, Api
-from sqlalchemy.orm import (Session)
 
-from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS)
-from database import (metadata)
-from database.connection import (engine)
-from apps.role.model import (RoleTable)
-from database import (get_session)
+# Importing from project files
+from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
+from apps import (role_router)
 
+
+# Flask object
 app = Flask(__name__)
-api = Api(app)
 
 
+# --------------------------------------------------------------------------------------------------
+
+
+# CORS
 app.config["CORS_HEADERS"] = CORS_ALLOW_HEADERS
 app.config["CORS_ORIGINS"] = CORS_ALLOW_ORIGINS
 app.config["CORS_METHODS"] = CORS_ALLOW_METHODS
 
 
-metadata.drop_all(bind=engine)
-metadata.create_all(bind=engine)
-
-
-from sqlalchemy.orm import (Session, sessionmaker)
-
-SessionLocal: Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-async def get_session():
+@app.route("/")
+def root():
     """
-        Get session
+        Root
 
         Description:
-        - This function is used to get session.
+        - This function is used to create the root route.
 
         Parameters:
         - **None**
 
         Returns:
-        - **session** (AsyncSession): Session.
+        - **None
 
     """
-    print("Calling get_session method")
 
-    session: Session = SessionLocal()
-
-    try:
-        yield session
-
-    except Exception as err:
-        session.rollback()
-        raise err
-
-    finally:
-        session.close()
+    return {"message": f"Welcome to {PROJECT_TITLE}!"}
 
 
-def insert_roles(session: Session = get_session()):
-    """
-        Insert roles
-
-        Description:
-        - This function is used to insert roles.
-
-        Parameters:
-        - **None**
-
-        Returns:
-        - **None**
-
-    """
-    print("Calling insert_roles method")
-
-    # Insert admin role in database
-    admin_role: RoleTable = RoleTable(role_name="admin")
-    user_role: RoleTable = RoleTable(role_name="user")
-
-    db: Session = SessionLocal()
-    db.add(admin_role)
-    db.add(user_role)
-    db.commit()
-    db.close()
+# Register routers
+app.register_blueprint(role_router)
 
 
-insert_roles()
-
-class HelloWorld(Resource):
-    def get(self):
-        return {'hello': 'world'}
-
-
-api.add_resource(HelloWorld, '/')
-# api.add_resource(TodoSimple, '/todo/<string:todo_id>')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# # Remove all code below this line when migrationg will be done
+# from database import (metadata, get_session)
+# from database.connection import (engine)
+# from apps.role.model import (RoleTable)
 
 
-print("******************************************")
-print(app.url_map)
-print("******************************************")
+# metadata.drop_all(bind=engine)
+# metadata.create_all(bind=engine)
+
+
+# def insert_roles(session = get_session()):
+#     """
+#         Insert roles
+
+#         Description:
+#         - This function is used to insert roles.
+
+#         Parameters:
+#         - **None**
+
+#         Returns:
+#         - **None**
+
+#     """
+#     print("Calling insert_roles method")
+
+
+#     admin_role: RoleTable = RoleTable(role_name="admin")
+#     user_role: RoleTable = RoleTable(role_name="user")
+
+#     session.add(admin_role)
+#     session.add(user_role)
+#     session.commit()
+
+
+# insert_roles()
+
+
+# print("******************************************")
+# print(app.url_map)
+# print("******************************************")

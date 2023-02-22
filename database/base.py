@@ -12,6 +12,7 @@ from sqlalchemy import (func)
 from sqlalchemy.orm import (Mapped, declared_attr, mapped_column)
 
 # Importing Flask packages
+from sqlalchemy_serializer import SerializerMixin
 
 # Importing from project files
 from .connection import (Base)
@@ -20,7 +21,7 @@ from .connection import (Base)
 # --------------------------------------------------------------------------------------------------
 
 
-class BaseTable(Base):
+class BaseTable(Base, SerializerMixin):
     """
         Base Table
 
