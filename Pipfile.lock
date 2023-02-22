@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "50bc49f053016af637ddbd46aea64914635fd2e0ea5046fb7e2b531c4bb69ccd"
+            "sha256": "9619e63d63fe4ca1e1a0a166dad8023da505cb75d8c3b41398819bee89ed85fe"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "alembic": {
+            "hashes": [
+                "sha256:4d3bd32ecdbb7bbfb48a9fe9e6d6fd6a831a1b59d03e26e292210237373e7db5",
+                "sha256:6f1c2207369bf4f49f952057a33bb017fbe5c148c2a773b46906b806ea6e825f"
+            ],
+            "index": "pypi",
+            "version": "==1.9.4"
+        },
         "click": {
             "hashes": [
                 "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e",
@@ -122,6 +130,14 @@
             "markers": "python_version >= '3.7'",
             "version": "==3.1.2"
         },
+        "mako": {
+            "hashes": [
+                "sha256:c97c79c018b9165ac9922ae4f32da095ffd3c4e6872b45eded42926deea46818",
+                "sha256:d60a3903dc3bb01a18ad6a89cdbe2e4eadc69c0bc8ef1e3773ba53d44c3f7a34"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==1.2.4"
+        },
         "markupsafe": {
             "hashes": [
                 "sha256:0576fe974b40a400449768941d5d0858cc624e3249dfd1e0c33674e5c7ca7aed",
@@ -208,9 +224,6 @@
             "version": "==23.0"
         },
         "pydantic": {
-            "extras": [
-                "dotenv"
-            ],
             "hashes": [
                 "sha256:1fd326aff5d6c36f05735c7c9b3d5b0e933b4ca52ad0b6e4b38038d82703d35b",
                 "sha256:2185a3b3d98ab4506a3f6707569802d2d92c3a7ba3a9a35683a7709ea6c2aaa2",
@@ -250,7 +263,6 @@
                 "sha256:f836444b4c5ece128b23ec36a446c9ab7f9b0f7981d0d27e13a7c366ee163f8a"
             ],
             "index": "pypi",
-            "markers": null,
             "version": "==1.10.5"
         },
         "python-dotenv": {
@@ -311,6 +323,13 @@
             "index": "pypi",
             "markers": null,
             "version": "==2.0.4"
+        },
+        "sqlalchemy-serializer": {
+            "hashes": [
+                "sha256:c4cf3e3eebbffa5b46a77ddb886230e5d8c17fd0b9ddbd57eed1a837eb1463cc"
+            ],
+            "index": "pypi",
+            "version": "==1.4.1"
         },
         "typing-extensions": {
             "hashes": [

@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "*"
 sqlalchemy = {extras = ["all"], version = "*"}
+sqlalchemy-serializer = "*"
+alembic = "*"
 mysqlclient = "*"
 environs = "*"
 pydantic = "*"
