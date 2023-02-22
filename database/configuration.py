@@ -30,3 +30,10 @@ DB_PASSWORD: str = env.str("DB_PASSWORD")
 DB_NAME: str = env.str("DB_NAME")
 
 DATABASE_URL: str = f"{DATABASE}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+
+ADMIN_NAME: str = env.str("ADMIN_NAME")
+ADMIN_CONTACT: str = env.str("ADMIN_CONTACT")
+ADMIN_USERNAME: str = env.str("ADMIN_USERNAME")
+ADMIN_EMAIL: str = env.str("ADMIN_EMAIL")
+ADMIN_PASSWORD: str = env.str("ADMIN_PASSWORD")
