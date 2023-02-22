@@ -32,6 +32,11 @@ sudo mysql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password@123';
 ```
 
+- Create database by this command:
+```
+CREATE DATABASE IF NOT EXISTS horizontravels_database;
+```
+
 ## Installation
 - Configure [Pyenv](https://realpython.com/intro-to-pyenv/):
 To configure pyenv you can follow this [tutorial](https://realpython.com/intro-to-pyenv/).

@@ -36,14 +36,18 @@ def insert_admin(session=get_session()):
     """
     print("Calling insert_admin method")
 
-    admin: UserTable = UserTable(
-        name=ADMIN_NAME,
-        contact=ADMIN_CONTACT,
-        username=ADMIN_USERNAME,
-        email=ADMIN_EMAIL,
-        password=pbkdf2_sha256.hash(ADMIN_PASSWORD),
-        is_admin=True
-    )
+    try:
+        admin: UserTable = UserTable(
+            name=ADMIN_NAME,
+            contact=ADMIN_CONTACT,
+            username=ADMIN_USERNAME,
+            email=ADMIN_EMAIL,
+            password=pbkdf2_sha256.hash(ADMIN_PASSWORD),
+            is_admin=True
+        )
 
-    session.add(admin)
-    session.commit()
+        session.add(admin)
+        session.commit()
+
+    except Exception:
+        pass
