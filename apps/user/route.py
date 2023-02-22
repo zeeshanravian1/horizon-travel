@@ -51,7 +51,6 @@ def create_user(
         - **password** (STR): Password of user. *--Required*
         - **role_id** (INT): Role id of user. *--Required*
 
-
         Returns:
         user details along with following information:
         - **id** (INT): Id of user.
@@ -68,6 +67,22 @@ def create_user(
     print("Calling create_user method")
 
     try:
+        # Check if username already exists
+        query = select(UserTable).where(UserTable.username == request.json["username"])
+        result = db_session.execute(query).first()
+
+        if result:
+            return ({"success": False, "message": "Username already exists", "data": None},
+                    409, CONTENT_TYPE)
+
+        # Check if email already exists
+        query = select(UserTable).where(UserTable.email == request.json["email"])
+        result = db_session.execute(query).first()
+
+        if result:
+            return ({"success": False, "message": "Email already exists", "data": None},
+                    409, CONTENT_TYPE)
+
         record = UserTable(**request.json)
 
         db_session.add(record)
@@ -230,6 +245,24 @@ def update_user(
     print("Calling update_user method")
 
     try:
+        # Check if username already exists
+        if request.json["username"]:
+            query = select(UserTable).where(UserTable.username == request.json["username"])
+            result = db_session.execute(query).first()
+
+            if result:
+                return ({"success": False, "message": "Username already exists", "data": None},
+                        409, CONTENT_TYPE)
+
+        # Check if email already exists
+        if request.json["email"]:
+            query = select(UserTable).where(UserTable.email == request.json["email"])
+            result = db_session.execute(query).first()
+
+            if result:
+                return ({"success": False, "message": "Email already exists", "data": None},
+                        409, CONTENT_TYPE)
+
         query = select(UserTable).where(and_(UserTable.id == user_id,
                                              UserTable.is_deleted == False))
 
