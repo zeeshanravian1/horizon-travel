@@ -110,3 +110,9 @@ alembic revision --autogenerate -m "<Migration Name>"
 ```
 alembic upgrade heads
 ```
+
+## Running Project
+- Run Project
+```
+flask --app main.py --debug run
+```
