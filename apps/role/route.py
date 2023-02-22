@@ -25,16 +25,16 @@ from ..base import (CONTENT_TYPE)
 
 
 role_router = Blueprint(
-    name='Role',
+    name="Role",
     import_name=__name__,
-    url_prefix='/role',
+    url_prefix="/role",
 )
 
 
 # --------------------------------------------------------------------------------------------------
 
 
-@role_router.post('/')
+@role_router.post("/")
 def create_role(db_session: Session = get_session()):
     """
         Create a single role.
@@ -66,32 +66,32 @@ def create_role(db_session: Session = get_session()):
         db_session.commit()
         db_session.refresh(record)
 
-        return ({'success': True, 'message': 'Role created successfully', 'data': record.to_dict()},
+        return ({"success": True, "message": "Role created successfully", "data": record.to_dict()},
                 201, CONTENT_TYPE)
 
     except IntegrityError as err:
         print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
-            return ({'success': False, 'message': 'Role already exists', 'data': None},
+            return ({"success": False, "message": "Role already exists", "data": None},
                     409, CONTENT_TYPE)
 
         if err.orig.args[0] == 1452:
-            return ({'success': False, 'message': 'Invalid role id', 'data': None},
+            return ({"success": False, "message": "Invalid role id", "data": None},
                     400, CONTENT_TYPE)
 
-        return ({'success': False, 'message': 'Integrity error', 'data': None},
+        return ({"success": False, "message": "Integrity error", "data": None},
                 400, CONTENT_TYPE)
 
     except Exception as err:
         print("error", err)
         db_session.rollback()
-        return ({'success': False, 'message': 'Something went wrong', 'data': None},
+        return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
 
 
 # Get a single role route
-@role_router.get('/<int:role_id>')
+@role_router.get("/<int:role_id>")
 def get_role(
     role_id: int, db_session: Session = get_session()
 ) -> RoleReadSchema:
@@ -119,15 +119,15 @@ def get_role(
     record = db_session.execute(statement=query).scalar_one_or_none()
 
     if record is None:
-        return ({'success': False, 'message': ROLE_NOT_FOUND, 'data': None},
+        return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
-    return ({'success': True, 'message': 'Role fetched successfully', 'data': record.to_dict()},
+    return ({"success": True, "message": "Role fetched successfully", "data": record.to_dict()},
             200, CONTENT_TYPE)
 
 
 # Get all roles route
-@role_router.get('/')
+@role_router.get("/")
 def get_all_roles(
     page: int | None = 1, limit: int | None = 10,
     db_session: Session = get_session()
@@ -165,17 +165,17 @@ def get_all_roles(
     result = db_session.execute(query).scalars().all()
 
     if not result:
-        return ({'success': False, 'message': ROLE_NOT_FOUND, 'data': None},
+        return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
-    return ({'success': True, 'message': 'Roles fetched successfully',
-             'data': {'total': total_count, 'page': page, 'limit': limit,
-                      'items': [role.to_dict() for role in result]}},
+    return ({"success": True, "message": "Roles fetched successfully",
+             "data": {"total": total_count, "page": page, "limit": limit,
+                      "items": [role.to_dict() for role in result]}},
             200, CONTENT_TYPE)
 
 
 # Update a single role route
-@role_router.put('/<int:role_id>')
+@role_router.put("/<int:role_id>")
 def update_role(
     role_id: int, db_session: Session = get_session()
 ) -> RoleReadSchema:
@@ -210,39 +210,39 @@ def update_role(
         result = db_session.execute(query).scalar_one_or_none()
 
         if result is None:
-            return ({'success': False, 'message': ROLE_NOT_FOUND, 'data': None},
+            return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                     404, CONTENT_TYPE)
 
         result.role_name = record.role_name
 
         db_session.commit()
 
-        return ({'success': True, 'message': 'Role updated successfully', 'data': result.to_dict()},
+        return ({"success": True, "message": "Role updated successfully", "data": result.to_dict()},
                 200, CONTENT_TYPE)
 
     except IntegrityError as err:
         print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
-            return ({'success': False, 'message': 'Role already exists', 'data': None},
+            return ({"success": False, "message": "Role already exists", "data": None},
                     409, CONTENT_TYPE)
 
         if err.orig.args[0] == 1452:
-            return ({'success': False, 'message': 'Invalid role id', 'data': None},
+            return ({"success": False, "message": "Invalid role id", "data": None},
                     400, CONTENT_TYPE)
 
-        return ({'success': False, 'message': 'Integrity error', 'data': None},
+        return ({"success": False, "message": "Integrity error", "data": None},
                 400, CONTENT_TYPE)
 
     except Exception as err:
         print("error", err)
         db_session.rollback()
-        return ({'success': False, 'message': 'Internal server error', 'data': None},
+        return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
 
 
 # Delete a single role route
-@role_router.delete('/<int:role_id>')
+@role_router.delete("/<int:role_id>")
 def delete_role(
     role_id: int, db_session: Session = get_session()
 ) -> RoleReadSchema:
@@ -270,11 +270,11 @@ def delete_role(
     result = db_session.execute(query).scalar_one_or_none()
 
     if result is None:
-        return ({'success': False, 'message': ROLE_NOT_FOUND, 'data': None},
+        return ({"success": False, "message": ROLE_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
     db_session.delete(result)
     db_session.commit()
 
-    return ({'success': True, 'message': 'Role deleted successfully', 'data': result.to_dict()},
+    return ({"success": True, "message": "Role deleted successfully", "data": result.to_dict()},
             200, CONTENT_TYPE)

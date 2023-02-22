@@ -53,8 +53,8 @@ class CustomMiddleware:
 
         """
         # Code to execute before each request
-        print('CustomMiddleware: Processing request...')
-        print(f'CustomMiddleware: Request path: {request.path}')
+        print("CustomMiddleware: Processing request...")
+        print(f"CustomMiddleware: Request path: {request.path}")
 
     def process_response(self, request: Request, response: Response):
         """
@@ -72,7 +72,7 @@ class CustomMiddleware:
 
         """
         # Code to execute after each request
-        print('CustomMiddleware: Processing response...')
-        print(f'CustomMiddleware: Request path: {request.path}')
-        print(f'CustomMiddleware: Response status code: {response.status_code}')
+        print("CustomMiddleware: Processing response...")
+        print(f"CustomMiddleware: Request path: {request.path}")
+        print(f"CustomMiddleware: Response status code: {response.status_code}")
         return response
