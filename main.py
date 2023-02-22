@@ -14,7 +14,7 @@ from flask import Flask
 
 # Importing from project files
 from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
-from apps import (role_router)
+from apps import (role_router, user_router)
 
 
 # Flask object
@@ -51,6 +51,7 @@ def root():
 
 # Register routers
 app.register_blueprint(role_router)
+app.register_blueprint(user_router)
 
 
 # # Remove all code below this line when migrationg will be done

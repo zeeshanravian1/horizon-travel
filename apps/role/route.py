@@ -23,7 +23,7 @@ from ..base import (CONTENT_TYPE)
 
 
 role_router = Blueprint(
-    name="Role",
+    name="RoleRouter",
     import_name=__name__,
     url_prefix="/role",
 )
@@ -140,7 +140,8 @@ def get_all_roles(
         - This method is used to get all roles.
 
         Parameters:
-        - **None**
+        - **page** (INT): Page number. *--Optional*
+        - **limit** (INT): Limit of records per page. *--Optional*
 
         Returns:
         Get all roles with following information:
