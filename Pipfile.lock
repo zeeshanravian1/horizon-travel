@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "9619e63d63fe4ca1e1a0a166dad8023da505cb75d8c3b41398819bee89ed85fe"
+=======
+            "sha256": "b8fb3d3547b8c18d7a9d4ec0b99ae17171fb6f1f398fcfb588fdb89a4f708dd2"
+>>>>>>> 52876a1 (:sparkles: Added templates!)
         },
         "pipfile-spec": 6,
         "requires": {
@@ -321,7 +325,6 @@
                 "sha256:fdb2686eb01f670cdc6c43f092e333ff08c1cf0b646da5256c1237dc4ceef4ae"
             ],
             "index": "pypi",
-            "markers": null,
             "version": "==2.0.4"
         },
         "sqlalchemy-serializer": {

@@ -11,6 +11,7 @@ alembic = "*"
 mysqlclient = "*"
 environs = "*"
 pydantic = "*"
+sqlalchemy-serializer = "*"
 
 [dev-packages]
 autopep8 = "*"

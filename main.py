@@ -10,7 +10,7 @@
 # Importing Python packages
 
 # Importing Flask packages
-from flask import Flask
+from flask import Flask, render_template
 
 # Importing from project files
 from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
@@ -45,8 +45,7 @@ def root():
         - **None
 
     """
-
-    return {"message": f"Welcome to {PROJECT_TITLE}!"}
+    return render_template("index.html", message=f"Welcome to {PROJECT_TITLE}!")
 
 
 # Register routers
