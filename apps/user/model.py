@@ -8,10 +8,10 @@
 
 # Importing Python packages
 from pydantic import (EmailStr)
-from sqlalchemy import (Boolean, ForeignKey, Integer, String)
+from sqlalchemy import (Boolean, String)
 from sqlalchemy.orm import (Mapped, mapped_column)
 
-# Importing FastAPI packages
+# Importing Flask packages
 
 # Importing from project files
 from database.base import (BaseTable)
@@ -33,7 +33,6 @@ class UserTable(BaseTable):
     username: Mapped[str] = mapped_column(String(2_55), unique=True, nullable=False)
     email: Mapped[EmailStr] = mapped_column(String(2_55), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(2_55), nullable=False)
+    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     password_otp: Mapped[str] = mapped_column(String(6), nullable=True, default=None)
     password_verified: Mapped[bool] = mapped_column(Boolean, nullable=True, default=None)
-
-    role_id: Mapped[int] = mapped_column(Integer, ForeignKey("roles.id"), nullable=False)

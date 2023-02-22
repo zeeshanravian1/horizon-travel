@@ -10,11 +10,11 @@
 # Importing Python packages
 
 # Importing Flask packages
-from flask import Flask, render_template
+from flask import Flask
 
 # Importing from project files
 from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
-from apps import (role_router, user_router)
+from apps import (user_router, auth_router)
 
 
 # Flask object
@@ -45,30 +45,43 @@ def root():
         - **None
 
     """
-    return render_template("index.html", message=f"Welcome to {PROJECT_TITLE}!")
+
+    return {"message": f"Welcome to {PROJECT_TITLE}!"}
 
 
 # Register routers
-app.register_blueprint(role_router)
 app.register_blueprint(user_router)
+app.register_blueprint(auth_router)
 
 
 # # Remove all code below this line when migrationg will be done
 # from database import (metadata, get_session)
 # from database.connection import (engine)
-# from apps.role.model import (RoleTable)
+# from apps.user.model import (UserTable)
+# from passlib.hash import (pbkdf2_sha256)
+# import environs
 
 
 # metadata.drop_all(bind=engine)
 # metadata.create_all(bind=engine)
 
 
-# def insert_roles(session = get_session()):
+# env = environs.Env()
+
+# # Admin
+# NAME: str = env.str("ADMIN_NAME")
+# CONTACT: str = env.str("ADMIN_CONTACT")
+# USERNAME: str = env.str("ADMIN_USERNAME")
+# EMAIL: str = env.str("ADMIN_EMAIL")
+# PASSWORD: str = env.str("ADMIN_PASSWORD")
+
+
+# def insert_admin(session = get_session()):
 #     """
-#         Insert roles
+#         Insert admin
 
 #         Description:
-#         - This function is used to insert roles.
+#         - This function is used to insert admin.
 
 #         Parameters:
 #         - **None**
@@ -77,18 +90,22 @@ app.register_blueprint(user_router)
 #         - **None**
 
 #     """
-#     print("Calling insert_roles method")
+#     print("Calling insert_admin method")
 
-
-#     admin_role: RoleTable = RoleTable(role_name="admin")
-#     user_role: RoleTable = RoleTable(role_name="user")
-
-#     session.add(admin_role)
-#     session.add(user_role)
+#     admin: UserTable = UserTable(
+#         name=NAME,
+#         contact=CONTACT,
+#         username=USERNAME,
+#         email=EMAIL,
+#         password=pbkdf2_sha256.hash(PASSWORD),
+#         is_admin=True
+#     )
+    
+#     session.add(admin)
 #     session.commit()
 
 
-# insert_roles()
+# insert_admin()
 
 
 # print("******************************************")

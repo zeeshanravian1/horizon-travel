@@ -1,13 +1,13 @@
 """
-    Role Configuration Module
+    Authentication Configuration Module
 
     Description:
-    - This module is responsible for role configuration and read values from environment file.
+    - This module is responsible for authentication configuration and read values from environment
+    file.
 
 """
 
 # Importing Python packages
-from typing import (Literal)
 
 # Importing Flask packages
 
@@ -17,6 +17,4 @@ from typing import (Literal)
 # --------------------------------------------------------------------------------------------------
 
 
-ROLE_ENUM = Literal["admin", "manager", "user"]
 
-ROLE: str = "admin"

@@ -32,87 +32,6 @@ user_router = Blueprint(
 # --------------------------------------------------------------------------------------------------
 
 
-@user_router.post("/")
-def create_user(
-    db_session: Session = get_session()
-):
-    """
-        Create a single user.
-
-        Description:
-        - This method is used to create a single user.
-
-        Parameters:
-        User details to be created with following fields:
-        - **name** (STR): Name of user. *--Required*
-        - **contact** (STR): Contact of user. *--Required*
-        - **username** (STR): Username of user. *--Required*
-        - **email** (STR): Email of user. *--Required*
-        - **password** (STR): Password of user. *--Required*
-        - **role_id** (INT): Role id of user. *--Required*
-
-        Returns:
-        user details along with following information:
-        - **id** (INT): Id of user.
-        - **name** (STR): Name of user.
-        - **contact** (STR): Contact of user.
-        - **username** (STR): Username of user.
-        - **email** (STR): Email of user.
-        - **password** (STR): Password of user.
-        - **role_id** (INT): Role id of user.
-        - **created_at** (DATETIME): Datetime of user creation.
-        - **updated_at** (DATETIME): Datetime of user updation.
-
-    """
-    print("Calling create_user method")
-
-    try:
-        # Check if username already exists
-        query = select(UserTable).where(UserTable.username == request.json["username"])
-        result = db_session.execute(query).first()
-
-        if result:
-            return ({"success": False, "message": "Username already exists", "data": None},
-                    409, CONTENT_TYPE)
-
-        # Check if email already exists
-        query = select(UserTable).where(UserTable.email == request.json["email"])
-        result = db_session.execute(query).first()
-
-        if result:
-            return ({"success": False, "message": "Email already exists", "data": None},
-                    409, CONTENT_TYPE)
-
-        record = UserTable(**request.json)
-
-        db_session.add(record)
-        db_session.commit()
-        db_session.refresh(record)
-
-        return ({"success": True, "message": "user created successfully", "data": record.to_dict()},
-                201, CONTENT_TYPE)
-
-    except IntegrityError as err:
-        print("integrity error", err)
-        db_session.rollback()
-        if err.orig.args[0] == 1062:
-            return ({"success": False, "message": "user already exists", "data": None},
-                    409, CONTENT_TYPE)
-
-        if err.orig.args[0] == 1452:
-            return ({"success": False, "message": "Invalid user id", "data": None},
-                    400, CONTENT_TYPE)
-
-        return ({"success": False, "message": "Integrity error", "data": None},
-                400, CONTENT_TYPE)
-
-    except Exception as err:
-        print("error", err)
-        db_session.rollback()
-        return ({"success": False, "message": "Something went wrong", "data": None},
-                500, CONTENT_TYPE)
-
-
 # Get a single user route
 @user_router.get("/<int:user_id>/")
 def get_user(
@@ -135,7 +54,7 @@ def get_user(
         - **username** (STR): Username of user.
         - **email** (STR): Email of user.
         - **password** (STR): Password of user.
-        - **role_id** (INT): Role id of user.
+        - **is_admin** (BOOL): Is user admin or not.
         - **created_at** (DATETIME): Datetime of user creation.
         - **updated_at** (DATETIME): Datetime of user updation.
 
@@ -181,15 +100,14 @@ def get_all_users(
         - **username** (STR): Username of user.
         - **email** (STR): Email of user.
         - **password** (STR): Password of user.
-        - **role_id** (INT): Role id of user.
+        - **is_admin** (BOOL): Is user admin or not.
         - **created_at** (DATETIME): Datetime of user creation.
         - **updated_at** (DATETIME): Datetime of user updation.
 
     """
     print("Calling get_all_users method")
 
-    query = select(func.count(UserTable.id)).where(
-        UserTable.is_deleted == False)
+    query = select(func.count(UserTable.id)).where(UserTable.is_deleted == False)
     result = db_session.execute(query)
     total_count = result.scalar()
 
@@ -237,7 +155,7 @@ def update_user(
         - **username** (STR): Username of user.
         - **email** (STR): Email of user.
         - **password** (STR): Password of user.
-        - **role_id** (INT): Role id of user.
+        - **is_admin** (BOOL): Is user admin or not.
         - **created_at** (DATETIME): Datetime of user creation.
         - **updated_at** (DATETIME): Datetime of user updation.
 
@@ -315,11 +233,7 @@ def delete_user(
         - **user_id** (INT): ID of user to be deleted. *--Required*
 
         Returns:
-        user details along with following information:
-        - **id** (INT): Id of user.
-        - **user_name** (STR): Name of user.
-        - **created_at** (DATETIME): Datetime of user creation.
-        - **updated_at** (DATETIME): Datetime of user updation.
+        - **message** (STR): User deleted successfully.
 
     """
     print("Calling delete_user method")
@@ -337,5 +251,5 @@ def delete_user(
 
     db_session.commit()
 
-    return ({"success": True, "message": "user deleted successfully"},
+    return ({"success": True, "message": "User deleted successfully"},
             200, CONTENT_TYPE)

@@ -8,14 +8,46 @@ You can also use [Alembic](https://alembic.sqlalchemy.org/en/latest/) for databa
 
 This project contains all routes relating to travel and travel related activities.
 
-## Installation
-- Python Installation:
-To install project dependencies you must have python 3.11 installed on your system.
-If python 3.11 is not installed you can download it from [python website](https://www.python.org/downloads/) or you can configure your system to handle multiple python versions using [pyenv](https://realpython.com/intro-to-pyenv/).
 
-Verify your python installation by typing this command in your terminal:
+## MySQL Database
+This project uses [MySQL](https://www.mysql.com/) database for storing data.
+
+- You can download MySQL by this command:
 ```
-python --version
+sudo apt install mysql-server
+```
+
+- You can start MySQL server by this command:
+```
+sudo systemctl start mysql
+```
+
+- Run MySQL shell by this command:
+```
+sudo mysql
+```
+
+- Change root password by this command:
+```
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password@123';
+```
+
+## Installation
+- Configure [Pyenv](https://realpython.com/intro-to-pyenv/):
+To configure pyenv you can follow this [tutorial](https://realpython.com/intro-to-pyenv/).
+
+- Install mysql dependencies:
+```
+sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+```
+
+- Python Installation:
+To run project, you must have python 3.11 installed on your system.
+If python 3.11 is not installed pyenv will install it for you as you have already configured pyenv.
+
+- Change Global Python Version:
+```
+pyenv global 3.11.0
 ```
 
 - Pipenv Installation:

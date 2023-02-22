@@ -6,5 +6,5 @@
 
 """
 
-from .role import (role_router)
 from .user import (user_router)
+from .auth import (auth_router)

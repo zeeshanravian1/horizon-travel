@@ -5,13 +5,17 @@ name = "pypi"
 
 [packages]
 flask = "*"
+flask-login = "*"
+flask-wtf = "*"
+wtforms = "*"
 sqlalchemy = {extras = ["all"], version = "*"}
 sqlalchemy-serializer = "*"
 alembic = "*"
 mysqlclient = "*"
 environs = "*"
 pydantic = "*"
-sqlalchemy-serializer = "*"
+passlib = "*"
+email-validator = "*"
 
 [dev-packages]
 autopep8 = "*"
