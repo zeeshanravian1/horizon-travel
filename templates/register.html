@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Document</title>
+</head>
+<body>
+    <div class="flex justify-center items-center min-h-screen">
+        <div class="w-full max-w-md">
+          <form class="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4" method="POST">
+            <h2 class="text-center font-bold text-2xl mb-6">Register</h2>
+            {{ form.csrf_token }}
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="name">
+                Name
+              </label>
+              {{ form.name(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.name.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="username">
+                Username
+              </label>
+              {{ form.username(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.username.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="email">
+                Email
+              </label>
+              {{ form.email(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.email.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="contact">
+                Contact
+              </label>
+              {{ form.contact(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.contact.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="password">
+                Password
+              </label>
+              {{ form.password(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.password.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="mb-6">
+              <label class="block text-gray-700 font-bold mb-2" for="confirm_password">
+                Confirm Password
+              </label>
+              {{ form.confirm_password(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+              {% for error in form.confirm_password.errors %}
+              <p class="text-red-500 text-xs italic">{{ error }}</p>
+              {% endfor %}
+            </div>
+            <div class="flex items-center justify-between">
+              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                Register
+              </button>
+              <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="{{ url_for('AuthenticationRouter.login') }}">
+                Already have an account?
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+</body>
+</html>

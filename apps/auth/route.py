@@ -10,12 +10,13 @@
 from passlib.hash import (pbkdf2_sha256)
 from sqlalchemy import (select)
 from sqlalchemy.orm import (Session)
-from sqlalchemy.exc import (IntegrityError)
+from sqlalchemy.exc import (IntegrityError, PendingRollbackError, InvalidRequestError, 
+                            StatementError, ResourceClosedError)
 
 # Importing Flask packages
 from wsgi import (login_manager)
 from flask import (Blueprint, flash, request, render_template, redirect, url_for)
-from flask_login import (login_user, logout_user, login_required)
+from flask_login import (login_user, logout_user, login_required, current_user)
 
 # Importing from project files
 from database.session import (get_session)
@@ -73,16 +74,15 @@ def register(db_session: Session = get_session()):
 
     try:
         db_session.commit()
-    except IntegrityError:
+    except (IntegrityError, PendingRollbackError, InvalidRequestError, 
+            FlushError, StatementError, ResourceClosedError):
         db_session.rollback()
         flash("Username or email already exists.")
-        return ({"success": False, "message": "Username or email already exists.", "data": None},
-                400, CONTENT_TYPE)
+        return render_template("register.html", form=register_form)
 
-    flash("Registered successfully.")
+    flash("Registered successfully.", "success")
 
-    return ({"success": True, "message": "Registered successfully.", "data": None},
-            200, CONTENT_TYPE)
+    return redirect(url_for("AuthenticationRouter.login"))
 
 
 # Login Route
@@ -102,6 +102,9 @@ def login(db_session: Session = get_session()):
 
     """
     print("Calling login route")
+
+    if current_user.is_authenticated:
+        return redirect(url_for("root"))
 
     login_form = LoginForm()
 
@@ -150,7 +153,7 @@ def logout():
     print("Calling logout route")
 
     logout_user()
-    flash("Logged out successfully.")
+    flash("Logged out successfully.", "success")
 
     return redirect(url_for("AuthenticationRouter.login"))
 
