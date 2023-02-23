@@ -8,9 +8,12 @@
 """
 
 # Importing Python packages
+import os
 
 # Importing Flask packages
-from flask import Flask
+from flask import (render_template)
+from wsgi import app
+from flask_login import login_required
 
 # Importing from project files
 from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
@@ -18,9 +21,10 @@ from apps import (user_router, auth_router)
 
 
 # Flask object
-app = Flask(__name__)
 
 
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
 # --------------------------------------------------------------------------------------------------
 
 
@@ -31,6 +35,7 @@ app.config["CORS_METHODS"] = CORS_ALLOW_METHODS
 
 
 @app.route("/")
+@login_required
 def root():
     """
         Root
@@ -46,7 +51,7 @@ def root():
 
     """
 
-    return {"message": f"Welcome to {PROJECT_TITLE}!"}
+    return render_template("index.html", title=PROJECT_TITLE)
 
 
 # Register routers

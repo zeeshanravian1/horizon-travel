@@ -13,7 +13,8 @@ from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
 # Importing Flask packages
-from flask import (Blueprint, flash, request, render_template)
+from wsgi import (login_manager)
+from flask import (Blueprint, flash, request, render_template, redirect, url_for)
 from flask_login import (login_user, logout_user, login_required)
 
 # Importing from project files
@@ -107,28 +108,30 @@ def login(db_session: Session = get_session()):
     if request.method == "GET":
         return render_template("login.html", form=login_form)
 
+    if not login_form.validate_on_submit():
+        return render_template("login.html", form=login_form)
+
+    print(login_form.email.data, login_form.password.data)
     # Getting user data
     query = select(UserTable).where(UserTable.email == login_form.email.data)
-    user_data = db_session.execute(query).first()
-
-    if user_data.is_deleted:
-        flash(DISABLE_USER)
-
+    user_data = db_session.execute(query).scalar_one_or_none()
+    print(user_data)
     if not user_data:
-        flash(USER_NOT_FOUND)
+        flash('User not found!', 'error')
+        return render_template("login.html", form=login_form)
+
 
     if not pbkdf2_sha256.verify(login_form.password.data, user_data.password):
-        flash(PASSWORD_INCORRECT)
+        flash(PASSWORD_INCORRECT, 'error')
+        return render_template("login.html", form=login_form)
 
-    login_user(user_data)
-    flash("Logged in successfully.")
-
-    return ({"success": True, "message": "Logged in successfully.", "data": None},
-            200, CONTENT_TYPE)
+    flash("Logged in successfully.", 'success')
+    login_user(user_data, remember=login_form.remember.data)
+    return redirect(url_for("root"))
 
 
 # Logout Route
-@auth_router.route("/logout", methods=["POST"])
+@auth_router.route("/logout", methods=["GET"])
 @login_required
 def logout():
     """
@@ -149,5 +152,9 @@ def logout():
     logout_user()
     flash("Logged out successfully.")
 
-    return ({"success": True, "message": "Logged out successfully.", "data": None},
-            200, CONTENT_TYPE)
+    return redirect(url_for("AuthenticationRouter.login"))
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    # do stuff
+    return redirect(location=url_for("AuthenticationRouter.login"))

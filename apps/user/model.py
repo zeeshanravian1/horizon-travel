@@ -8,19 +8,25 @@
 
 # Importing Python packages
 from pydantic import (EmailStr)
-from sqlalchemy import (Boolean, String)
+from sqlalchemy import (Boolean, String, select)
 from sqlalchemy.orm import (Mapped, mapped_column)
 
 # Importing Flask packages
+from flask_login import (UserMixin)
 
 # Importing from project files
 from database.base import (BaseTable)
+from database.session import (get_session) 
+from wsgi import (login_manager)
 
 
 # --------------------------------------------------------------------------------------------------
+@login_manager.user_loader
+def load_user(id):
+    with get_session() as session:
+        return session.execute(select(UserTable).where(UserTable.id == id)).scalar_one_or_none()
 
-
-class UserTable(BaseTable):
+class UserTable(BaseTable, UserMixin):
     """
         User Table
 
