@@ -10,19 +10,19 @@
 from passlib.hash import (pbkdf2_sha256)
 from sqlalchemy import (select)
 from sqlalchemy.orm import (Session)
-from sqlalchemy.exc import (IntegrityError, PendingRollbackError, InvalidRequestError, 
+from sqlalchemy.exc import (IntegrityError, PendingRollbackError, InvalidRequestError,
                             StatementError, ResourceClosedError)
 
 # Importing Flask packages
-from wsgi import (login_manager)
 from flask import (Blueprint, flash, request, render_template, redirect, url_for)
 from flask_login import (login_user, logout_user, login_required, current_user)
+from wsgi import (login_manager)
+
 
 # Importing from project files
 from database.session import (get_session)
-from .exception import (DISABLE_USER, USER_NOT_FOUND, PASSWORD_INCORRECT)
+from .exception import (PASSWORD_INCORRECT)
 from .form import (LoginForm, RegistrationForm)
-from ..base import (CONTENT_TYPE)
 from ..user.model import (UserTable)
 
 
@@ -46,10 +46,10 @@ def register(db_session: Session = get_session()):
         - This route is responsible for handling registration requests.
 
         Parameters:
-        - None
+        - **None**
 
         Returns:
-        - None
+        - **None**
 
     """
     print("Calling registration route")
@@ -74,8 +74,8 @@ def register(db_session: Session = get_session()):
 
     try:
         db_session.commit()
-    except (IntegrityError, PendingRollbackError, InvalidRequestError, 
-            FlushError, StatementError, ResourceClosedError):
+    except (IntegrityError, PendingRollbackError, InvalidRequestError,
+            StatementError, ResourceClosedError):
         db_session.rollback()
         flash("Username or email already exists.")
         return render_template("register.html", form=register_form)
@@ -95,10 +95,10 @@ def login(db_session: Session = get_session()):
         - This route is responsible for handling login requests.
 
         Parameters:
-        - None
+        - **None**
 
         Returns:
-        - None
+        - **None**
 
     """
     print("Calling login route")
@@ -123,7 +123,6 @@ def login(db_session: Session = get_session()):
         flash('User not found!', 'error')
         return render_template("login.html", form=login_form)
 
-
     if not pbkdf2_sha256.verify(login_form.password.data, user_data.password):
         flash(PASSWORD_INCORRECT, 'error')
         return render_template("login.html", form=login_form)
@@ -144,10 +143,10 @@ def logout():
         - This route is responsible for handling logout requests.
 
         Parameters:
-        - None
+        - **None**
 
         Returns:
-        - None
+        - **None**
 
     """
     print("Calling logout route")
@@ -157,7 +156,21 @@ def logout():
 
     return redirect(url_for("AuthenticationRouter.login"))
 
+
 @login_manager.unauthorized_handler
 def unauthorized():
-    # do stuff
+    """
+        Unauthorized Handler
+
+        Description:
+        - This handler is responsible for handling unauthorized requests.
+
+        Parameters:
+        - **None**
+
+        Returns:
+        - **None**
+
+    """
+
     return redirect(location=url_for("AuthenticationRouter.login"))

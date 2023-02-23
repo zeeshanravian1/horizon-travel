@@ -5,6 +5,7 @@
     - This module contains database configuration.
 
 """
+
 from .base import (BaseTable)
 from .configuration import (DATABASE_URL, DB_NAME)
 from .connection import (metadata)
