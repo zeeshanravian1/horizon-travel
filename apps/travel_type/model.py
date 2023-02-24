@@ -1,8 +1,8 @@
 """
-    Price category Model
+    Travel Type Model
 
     Description:
-    - This file contains model for price category table.
+    - This file contains model for travel type table.
 
 """
 
@@ -19,12 +19,12 @@ from database.base import (BaseTable)
 # --------------------------------------------------------------------------------------------------
 
 
-class PriceCategoryTable(BaseTable):
+class TravelTypeTable(BaseTable):
     """
-        Price Category Table
+        Travel Type Table
 
         Description:
-        - This table is used to create price category in database.
+        - This table is used to create travel type in database.
 
     """
     name: Mapped[str] = mapped_column(String(2_55), unique=True, nullable=False)

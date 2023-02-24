@@ -211,8 +211,6 @@ def update_price_category(
                     409, CONTENT_TYPE)
 
         result.name = request.json["name"]
-        result.longitude = request.json["longitude"]
-        result.latitude = request.json["latitude"]
 
         db_session.commit()
 
