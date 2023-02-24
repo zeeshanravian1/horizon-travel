@@ -34,9 +34,9 @@ class BaseTable(Base, SerializerMixin):
     # Generate __tablename__ automatically
     @declared_attr
     def __tablename__(self) -> str:
-        return self.__name__.lower().replace("table", "s")
+        return self.__name__.lower().replace("table", "")
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    is_deleted: Mapped[bool] = mapped_column(default=False ,server_default=func.false())
+    is_deleted: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
