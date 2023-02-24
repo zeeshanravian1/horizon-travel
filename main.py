@@ -17,7 +17,8 @@ from flask_login import login_required
 
 # Importing from project files
 from core import (CORS_ALLOW_HEADERS, CORS_ALLOW_METHODS, CORS_ALLOW_ORIGINS, PROJECT_TITLE)
-from apps import (auth_router, location_router, price_category_router, travel_type_router, user_router)
+from apps import (auth_router, location_router, max_seats_router, price_category_router,
+                  travel_type_router, user_router)
 
 
 # Flask object
@@ -57,11 +58,12 @@ def root():
 # Register routers
 app.register_blueprint(auth_router)
 app.register_blueprint(location_router)
+app.register_blueprint(max_seats_router)
 app.register_blueprint(price_category_router)
 app.register_blueprint(travel_type_router)
 app.register_blueprint(user_router)
 
 
-# print("******************************************")
-# print(app.url_map)
-# print("******************************************")
+print("******************************************")
+print(app.url_map)
+print("******************************************")
