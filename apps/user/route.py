@@ -70,7 +70,7 @@ def get_user(
         return ({"success": False, "message": USER_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
-    return ({"success": True, "message": "user fetched successfully", "data": record.to_dict()},
+    return ({"success": True, "message": "User fetched successfully", "data": record.to_dict()},
             200, CONTENT_TYPE)
 
 
