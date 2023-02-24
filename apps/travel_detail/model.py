@@ -28,7 +28,7 @@ class TravelDetailTable(BaseTable):
         - This table is used to create travel detail in database.
 
     """
-    travel_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("travel_type.id"),
+    travel_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("traveltype.id"),
                                                 nullable=False)
     departure_location_id: Mapped[int] = mapped_column(Integer, ForeignKey("location.id"),
                                                          nullable=False)

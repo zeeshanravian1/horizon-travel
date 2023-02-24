@@ -15,7 +15,7 @@ from alembic import (context)
 
 # Importing from project files
 from database import (DATABASE_URL, DB_NAME, metadata)
-from database import (insert_admin)
+from database import (insert_data)
 
 
 # --------------------------------------------------------------------------------------------------
@@ -91,8 +91,7 @@ def run_migrations_online() -> None:
             context.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
             context.run_migrations()
 
-            # Insert admin user
-            insert_admin()
+            insert_data()
 
 
 if context.is_offline_mode():

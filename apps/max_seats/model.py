@@ -29,5 +29,5 @@ class MaxSeatsTable(BaseTable):
     """
     seats: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    travel_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("travel_type.id"),
+    travel_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("traveltype.id"),
                                                 unique=True, nullable=False)
