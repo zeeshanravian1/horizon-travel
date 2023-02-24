@@ -71,7 +71,7 @@ def insert_data(session=get_session()):
 
         location_objects = [LocationTable(**location)
                             for location in locations]
-        
+
         session.add_all(location_objects)
         session.commit()
 
@@ -80,7 +80,7 @@ def insert_data(session=get_session()):
 
         price_category_objects = [PriceCategoryTable(name=price_category)
                                   for price_category in price_categories]
-        
+
         session.add_all(price_category_objects)
         session.commit()
 
@@ -96,12 +96,11 @@ def insert_data(session=get_session()):
         max_seats = [{"travel_type_id": 1, "seats": 120},
                      {"travel_type_id": 2, "seats": 300},
                      {"travel_type_id": 3, "seats": 50}]
-        
+
         max_seat_objects = [MaxSeatTable(**max_seat) for max_seat in max_seats]
 
         session.add_all(max_seat_objects)
         session.commit()
 
-    except Exception as err:
-        print(err)
+    except Exception:
         pass
