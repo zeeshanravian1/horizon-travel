@@ -135,7 +135,6 @@ def update_user(
 
         Description:
         - This method is used to update a single user by providing id.
-        - If any field is not provided, it will be updated with null value.
 
         Parameters:
         - **user_id** (INT): Id of user. *--Required*
@@ -161,24 +160,6 @@ def update_user(
     print("Calling update_user method")
 
     try:
-        # Check if username already exists
-        if request.json["username"]:
-            query = select(UserTable).where(UserTable.username == request.json["username"])
-            result = db_session.execute(query).first()
-
-            if result:
-                return ({"success": False, "message": "Username already exists", "data": None},
-                        409, CONTENT_TYPE)
-
-        # Check if email already exists
-        if request.json["email"]:
-            query = select(UserTable).where(UserTable.email == request.json["email"])
-            result = db_session.execute(query).first()
-
-            if result:
-                return ({"success": False, "message": "Email already exists", "data": None},
-                        409, CONTENT_TYPE)
-
         query = select(UserTable).where(and_(UserTable.id == user_id,
                                              UserTable.is_deleted == False))
 
@@ -187,8 +168,21 @@ def update_user(
         if result is None:
             return ({"success": False, "message": USER_NOT_FOUND, "data": None},
                     404, CONTENT_TYPE)
+        
+        if result.email == request.json["email"]:
+            return ({"success": False, "message": "Email already exists", "data": None},
+                    409, CONTENT_TYPE)
+        
+        if result.username == request.json["username"]:
+            return ({"success": False, "message": "Username already exists", "data": None},
+                    409, CONTENT_TYPE)
 
-        result.user_name = request.json.get("user_name", result.user_name)
+        result.name = request.json.get("name", result.name)
+        result.contact = request.json.get("contact", result.contact)
+        result.username = request.json.get("username", result.username)
+        result.email = request.json.get("email", result.email)
+        result.password = request.json.get("password", result.password)
+        result.is_admin = request.json.get("is_admin", result.is_admin)
 
         db_session.commit()
 
