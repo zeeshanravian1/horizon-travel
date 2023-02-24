@@ -1,8 +1,8 @@
 """
-    Max Seats Exceptions Module
+    Max seat Exceptions Module
 
     Description:
-    - This module is responsible for max seats exceptions.
+    - This module is responsible for max seat exceptions.
 """
 
 # Importing Python packages
@@ -15,4 +15,4 @@
 # --------------------------------------------------------------------------------------------------
 
 
-MAX_SEATS_NOT_FOUND: str = "max seats not found"
+MAX_SEAT_NOT_FOUND: str = "Max seat not found"

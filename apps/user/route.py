@@ -77,7 +77,7 @@ def get_user(
 # Get all users route
 @user_router.get("/")
 def get_all_users(
-    page: int | None = 1, limit: int | None = 10,
+    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -109,6 +109,8 @@ def get_all_users(
     result = db_session.execute(query)
     total_count = result.scalar()
 
+    query = select(UserTable).where(UserTable.is_deleted == False)
+
     if page and limit:
         query = select(UserTable).where(and_(
             UserTable.is_deleted == False, UserTable.id > (page - 1) * limit)).limit(limit)
@@ -118,6 +120,10 @@ def get_all_users(
     if not result:
         return ({"success": False, "message": USER_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
+    
+    if not (page and limit):
+        page = 1
+        limit = total_count
 
     return ({"success": True, "message": "users fetched successfully",
              "data": {"total": total_count, "page": page, "limit": limit,

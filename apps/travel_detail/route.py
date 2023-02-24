@@ -139,7 +139,7 @@ def get_travel_detail(
 # Get all travel details route
 @travel_detail_router.get("/")
 def get_all_travel_categories(
-    page: int | None = 1, limit: int | None = 10,
+    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -171,6 +171,8 @@ def get_all_travel_categories(
     result = db_session.execute(query)
     total_count = result.scalar()
 
+    query = select(TravelDetailTable).where(TravelDetailTable.is_deleted == False)
+
     if page and limit:
         query = select(TravelDetailTable).where(and_(
             TravelDetailTable.is_deleted == False, TravelDetailTable.id > (page - 1) * limit)).limit(limit)
@@ -180,6 +182,10 @@ def get_all_travel_categories(
     if not result:
         return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
+    
+    if not (page and limit):
+        page = 1
+        limit = total_count
 
     return ({"success": True, "message": "Travel details fetched successfully",
              "data": {"total": total_count, "page": page, "limit": limit,

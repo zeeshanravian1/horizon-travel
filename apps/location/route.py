@@ -133,7 +133,7 @@ def get_location(
 # Get all locations route
 @location_router.get("/")
 def get_all_locations(
-    page: int | None = 1, limit: int | None = 10,
+    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -163,6 +163,8 @@ def get_all_locations(
     result = db_session.execute(query)
     total_count = result.scalar()
 
+    query = select(LocationTable).where(LocationTable.is_deleted == False)
+
     if page and limit:
         query = select(LocationTable).where(and_(
             LocationTable.is_deleted == False, LocationTable.id > (page - 1) * limit)).limit(limit)
@@ -172,6 +174,10 @@ def get_all_locations(
     if not result:
         return ({"success": False, "message": LOCATION_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
+    
+    if not (page and limit):
+        page = 1
+        limit = total_count
 
     return ({"success": True, "message": "Locations fetched successfully",
              "data": {"total": total_count, "page": page, "limit": limit,

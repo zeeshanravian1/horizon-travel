@@ -1,8 +1,8 @@
 """
-    Max Seats Model
+    Max Seat Model
 
     Description:
-    - This file contains model for max seats table.
+    - This file contains model for max seat table.
 
 """
 
@@ -19,12 +19,12 @@ from database.base import (BaseTable)
 # --------------------------------------------------------------------------------------------------
 
 
-class MaxSeatsTable(BaseTable):
+class MaxSeatTable(BaseTable):
     """
-        Max Seats Table
+        Max Seat Table
 
         Description:
-        - This table is used to create max seats in database.
+        - This table is used to create max seat in database.
 
     """
     seats: Mapped[int] = mapped_column(Integer, nullable=False)

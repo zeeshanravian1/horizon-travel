@@ -127,7 +127,7 @@ def get_price_category(
 # Get all price categorys route
 @price_category_router.get("/")
 def get_all_price_categories(
-    page: int | None = 1, limit: int | None = 10,
+    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -155,6 +155,8 @@ def get_all_price_categories(
     result = db_session.execute(query)
     total_count = result.scalar()
 
+    query = select(PriceCategoryTable).where(PriceCategoryTable.is_deleted == False)
+
     if page and limit:
         query = select(PriceCategoryTable).where(and_(
             PriceCategoryTable.is_deleted == False, PriceCategoryTable.id > (page - 1) * limit)).limit(limit)
@@ -164,6 +166,10 @@ def get_all_price_categories(
     if not result:
         return ({"success": False, "message": PRICE_CATEGORY_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
+    
+    if not (page and limit):
+        page = 1
+        limit = total_count
 
     return ({"success": True, "message": "price categorys fetched successfully",
              "data": {"total": total_count, "page": page, "limit": limit,

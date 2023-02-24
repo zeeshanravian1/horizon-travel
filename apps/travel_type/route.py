@@ -127,7 +127,7 @@ def get_travel_type(
 # Get all travel types route
 @travel_type_router.get("/")
 def get_all_travel_categories(
-    page: int | None = 1, limit: int | None = 10,
+    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -155,6 +155,8 @@ def get_all_travel_categories(
     result = db_session.execute(query)
     total_count = result.scalar()
 
+    query = select(TravelTypeTable).where(TravelTypeTable.is_deleted == False)
+
     if page and limit:
         query = select(TravelTypeTable).where(and_(
             TravelTypeTable.is_deleted == False, TravelTypeTable.id > (page - 1) * limit)).limit(limit)
@@ -164,6 +166,10 @@ def get_all_travel_categories(
     if not result:
         return ({"success": False, "message": TRAVEL_TYPE_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
+    
+    if not (page and limit):
+        page = 1
+        limit = total_count
 
     return ({"success": True, "message": "Travel types fetched successfully",
              "data": {"total": total_count, "page": page, "limit": limit,
