@@ -17,12 +17,4 @@ from datetime import (datetime)
 # --------------------------------------------------------------------------------------------------
 
 
-ID: int = 1
-CREATED_AT: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-UPDATED_AT: str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
 CONTENT_TYPE: dict = {"ContentType": "application/json"}
-
-TOTAL: int = 0
-PAGE: int = 1
-LIMIT: int = 10

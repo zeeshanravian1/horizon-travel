@@ -188,7 +188,7 @@ def update_max_seats(
 
         Parameters:
         - **travel_type_id** (INT): Id of max seats. *--Required*
-        - **seats** (INT): Number of seats. *--Required*
+        - **seats** (INT): Number of seats. *--Optional*
 
         Returns:
         max seats details along with following information:

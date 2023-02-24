@@ -1,10 +1,8 @@
 """
-    Price Category Configuration Module
+    Travel Detail Exceptions Module
 
     Description:
-    - This module is responsible for price category configuration and read values from environment
-    file.
-
+    - This module is responsible for travel detail exceptions.
 """
 
 # Importing Python packages
@@ -17,4 +15,4 @@
 # --------------------------------------------------------------------------------------------------
 
 
-NAME: str = "business"
+TRAVEL_DETAIL_NOT_FOUND: str = "Travel detail not found"

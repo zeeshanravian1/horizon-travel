@@ -183,7 +183,7 @@ def update_price_category(
         - This method is used to update a single price category by providing id.
 
         Parameters:
-        - **price category_id** (INT): Id of price category. *--Required*
+        - **price_category_id** (INT): Id of price category. *--Required*
         - **name** (STR): Name of price category. *--Optional*
 
         Returns:

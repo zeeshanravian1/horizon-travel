@@ -183,7 +183,7 @@ def update_travel_type(
         - This method is used to update a single travel type by providing id.
 
         Parameters:
-        - **travel type_id** (INT): Id of travel type. *--Required*
+        - **travel_type_id** (INT): Id of travel type. *--Required*
         - **name** (STR): Name of travel type. *--Optional*
 
         Returns:
