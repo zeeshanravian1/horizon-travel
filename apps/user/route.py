@@ -61,8 +61,6 @@ def get_user(
     """
     print("Calling get_user method")
 
-    # Select user based on id and is deleted flag
-
     query = select(UserTable).where(and_(UserTable.id == user_id,
                                          UserTable.is_deleted == False))
 
