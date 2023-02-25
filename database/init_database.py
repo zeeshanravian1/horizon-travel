@@ -7,7 +7,7 @@
 """
 
 # Importing Python packages
-from datetime import (datetime, timedelta)
+from datetime import (datetime)
 from passlib.hash import (pbkdf2_sha256)
 
 # Importing FastAPI packages
@@ -19,6 +19,7 @@ from apps.price_category.model import (PriceCategoryTable)
 from apps.travel_type.model import (TravelTypeTable)
 from apps.max_seat.model import (MaxSeatTable)
 from apps.travel_detail.model import (TravelDetailTable)
+from apps.expense.model import (ExpenseTable)
 from .configuration import (ADMIN_NAME, ADMIN_CONTACT, ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD)
 from .session import (get_session)
 
@@ -78,7 +79,7 @@ def insert_data(session=get_session()):
         session.commit()
 
         # Insert price categories
-        price_categories = ["business", "economic"]
+        price_categories = ["business", "economy"]
 
         price_category_objects = [PriceCategoryTable(name=price_category)
                                   for price_category in price_categories]
@@ -106,7 +107,8 @@ def insert_data(session=get_session()):
 
         # Insert travel details
         locations = session.query(LocationTable).all()
-        locations = {location.name: location.id for location in locations}
+        location_names = {location.name: location.id for location in locations}
+        locations_ids = {location.id: location.name for location in locations}
 
         travel_details = [
             {
@@ -240,15 +242,15 @@ def insert_data(session=get_session()):
         travel_details_objects = []
 
         for travel_detail in travel_details:
-            for travel_type_id in range(1,4):
-                if travel_type_id in [2,3] and travel["arrival_location"] in ["Aberdeen", "Dundee"]:
+            for travel_type_id in range(1, 4):
+                if travel_type_id in [2, 3] and travel["arrival_location"] in ["Aberdeen", "Dundee"]:
                     continue
                 travel = travel_detail.copy()
                 travel["travel_type_id"] = travel_type_id
-                travel["departure_location_id"] = locations[travel["departure_location"]]
-                travel["arrival_location_id"] = locations[travel["arrival_location"]]
+                travel["departure_location_id"] = location_names[travel["departure_location"]]
+                travel["arrival_location_id"] = location_names[travel["arrival_location"]]
 
-                if travel_type_id in [2,3]:
+                if travel_type_id in [2, 3]:
                     total_time = datetime.strptime(travel["arrival_time"], "%Y-%m-%d %H:%M:%S") - datetime.strptime(travel["departure_time"], "%Y-%m-%d %H:%M:%S")
                     if travel_type_id == 2:
                         total_time *= 4
@@ -267,6 +269,65 @@ def insert_data(session=get_session()):
         travel_details_objects = [TravelDetailTable(**travel) for travel in travel_details_objects]
 
         session.add_all(travel_details_objects)
+        session.commit()
+
+        # Insert Expenses
+        traveL_details = session.query(TravelDetailTable).all()
+        travel_details = [travel.to_dict() for travel in traveL_details]
+
+        expenses = [{"departure": "Dundee", "arrival": "Portsmouth", "expense": 100},
+                    {"departure": "Portsmouth", "arrival": "Dundee", "expense": 100},
+                    {"departure": "Bristol", "arrival": "Manchester", "expense": 60},
+                    {"departure": "Manchester", "arrival": "Bristol", "expense": 60},
+                    {"departure": "Bristol", "arrival": "Newcastle", "expense": 80},
+                    {"departure": "Newcastle", "arrival": "Bristol", "expense": 80},
+                    {"departure": "Bristol", "arrival": "Glasgow", "expense": 90},
+                    {"departure": "Glasgow", "arrival": "Bristol", "expense": 90},
+                    {"departure": "Bristol", "arrival": "London", "expense": 60},
+                    {"departure": "London", "arrival": "Bristol", "expense": 60},
+                    {"departure": "Manchester", "arrival": "Southampton", "expense": 70},
+                    {"departure": "Southampton", "arrival": "Manchester", "expense": 70},
+                    {"departure": "Cardiff", "arrival": "Edinburgh", "expense": 80},
+                    {"departure": "Edinburgh", "arrival": "Cardiff", "expense": 80}]
+
+        expenses_objects = []
+
+        for travel_detail in travel_details:
+            departure_location = locations_ids[travel_detail["departure_location_id"]]
+            arrival_location = locations_ids[travel_detail["arrival_location_id"]]
+
+            dic = {
+                "travel_detail_id": travel_detail["id"],
+                "price_category_id": 2,
+                "cost": 75
+            }
+
+            for expense in expenses:
+                if expense["departure"] == departure_location and expense["arrival"] == arrival_location:
+                    if travel_detail["travel_type_id"] == 1:
+                        dic["cost"] = expense["expense"]
+                    elif travel_detail["travel_type_id"] == 2:
+                        dic["cost"] = round(expense["expense"] * 2.5, 2)
+                    elif travel_detail["travel_type_id"] == 3:
+                        dic["cost"] = round(expense["expense"] / 3, 2)
+                    break
+
+            expenses_objects.append(dic)
+
+        expenses_objects_2x = []
+
+        for expense in expenses_objects:
+            data = expense.copy()
+            data["price_category_id"] = 1
+            data["cost"] = round(data["cost"] * 2, 2)
+            expenses_objects_2x.append(data)
+
+        expenses_objects = expenses_objects + expenses_objects_2x
+
+        expenses_objects = [ExpenseTable(**expense)
+                            for expense in expenses_objects]
+
+        session.add_all(expenses_objects)
         session.commit()
 
     except Exception as err:
