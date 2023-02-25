@@ -118,7 +118,7 @@ def get_records(
             } for price_category in result}
 
         for expense in expenses:
-            expense["class_type"] = price_categories[expense["price_category_id"]]["name"]
+            expense["class_type"] = price_categories[expense["price_category_id"]]["name"].capitalize()
             expense["departure_location"] = travel_details[expense["travel_detail_id"]]["departure_location"]
             expense["departure_time"] = travel_details[expense["travel_detail_id"]]["departure_time"]
             expense["arrival_location"] = travel_details[expense["travel_detail_id"]]["arrival_location"]
@@ -141,7 +141,7 @@ def get_records(
             del expense["price_category_id"]
             del expense["travel_detail_id"]
 
-        # sort by cost
+        # Sort by cost
         expenses = sorted(expenses, key=lambda k: k['cost'])
 
         response = expenses
