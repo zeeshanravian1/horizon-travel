@@ -7,7 +7,8 @@
 """
 
 # Importing Python packages
-from datetime import (datetime)
+from random import random
+from datetime import (datetime, timedelta, time)
 from passlib.hash import (pbkdf2_sha256)
 
 # Importing FastAPI packages
@@ -25,6 +26,32 @@ from .session import (get_session)
 
 
 # --------------------------------------------------------------------------------------------------
+
+
+def update_travel_datetime(travel_detail, min_date, max_date):
+    """
+        Update travel datetime
+        
+        Description:
+        - This function is used to update travel datetime.
+
+        Parameters:
+        - **travel_detail** (dict): Travel detail.
+        - **min_date** (datetime): Minimum date.
+        - **max_date** (datetime): Maximum date.
+
+        Returns:
+        - **travel_detail** (dict): Travel detail.
+        
+    """
+    random_date = (min_date + (max_date - min_date) * random()).date()
+
+    travel_detail['departure_time'] = datetime.combine(random_date, time.fromisoformat(
+        travel_detail['departure_time'])).strftime("%Y-%m-%d %H:%M:%S")
+    travel_detail['arrival_time'] = datetime.combine(random_date, time.fromisoformat(
+        travel_detail['arrival_time'])).strftime("%Y-%m-%d %H:%M:%S")
+
+    return travel_detail
 
 
 # Insert Data
@@ -113,131 +140,139 @@ def insert_data(session=get_session()):
         travel_details = [
             {
                 "departure_location": "Newcastle",
-                "departure_time": "2022-10-23 16:45:00",
+                "departure_time": "16:45:00",
                 "arrival_location": "Bristol",
-                "arrival_time": "2022-10-23 18:00:00"
+                "arrival_time": "18:00:00"
             },
             {
                 "departure_location": "Bristol",
-                "departure_time": "2022-10-23 08:00:00",
+                "departure_time": "08:00:00",
                 "arrival_location": "Newcastle",
-                "arrival_time": "2022-10-23 09:15:00"
+                "arrival_time": "09:15:00"
             },
             {
                 "departure_location": "Cardiff",
-                "departure_time": "2022-10-23 06:00:00",
+                "departure_time": "06:00:00",
                 "arrival_location": "Edinburgh",
-                "arrival_time": "2022-10-23 07:30:00"
+                "arrival_time": "07:30:00"
             },
             {
                 "departure_location": "Bristol",
-                "departure_time": "2022-10-23 11:30:00",
+                "departure_time": "11:30:00",
                 "arrival_location": "Manchester",
-                "arrival_time": "2022-10-23 12:30:00"
+                "arrival_time": "12:30:00"
             },
             {
                 "departure_location": "Manchester",
-                "departure_time": "2022-10-23 12:20:00",
+                "departure_time": "12:20:00",
                 "arrival_location": "Bristol",
-                "arrival_time": "2022-10-23 13:20:00"
+                "arrival_time": "13:20:00"
             },
             {
                 "departure_location": "Bristol",
-                "departure_time": "2022-10-23 07:40:00",
+                "departure_time": "07:40:00",
                 "arrival_location": "London",
-                "arrival_time": "2022-10-23 08:20:00"
+                "arrival_time": "08:20:00"
             },
             {
                 "departure_location": "London",
-                "departure_time": "2022-10-23 11:00:00",
+                "departure_time": "11:00:00",
                 "arrival_location": "Manchester",
-                "arrival_time": "2022-10-23 12:20:00"
+                "arrival_time": "12:20:00"
             },
             {
                 "departure_location": "Manchester",
-                "departure_time": "2022-10-23 12:20:00",
+                "departure_time": "12:20:00",
                 "arrival_location": "Glasgow",
-                "arrival_time": "2022-10-23 13:30:00"
+                "arrival_time": "13:30:00"
             },
             {
                 "departure_location": "Bristol",
-                "departure_time": "2022-10-23 07:40:00",
+                "departure_time": "07:40:00",
                 "arrival_location": "Glasgow",
-                "arrival_time": "2022-10-23 08:45:00"
+                "arrival_time": "08:45:00"
             },
             {
                 "departure_location": "Glasgow",
-                "departure_time": "2022-10-23 14:30:00",
+                "departure_time": "14:30:00",
                 "arrival_location": "Newcastle",
-                "arrival_time": "2022-10-23 15:45:00"
+                "arrival_time": "15:45:00"
             },
             {
                 "departure_location": "Newcastle",
-                "departure_time": "2022-10-23 16:15:00",
+                "departure_time": "16:15:00",
                 "arrival_location": "Manchester",
-                "arrival_time": "2022-10-23 17:05:00"
+                "arrival_time": "17:05:00"
             },
             {
                 "departure_location": "Manchester",
-                "departure_time": "2022-10-23 18:25:00",
+                "departure_time": "18:25:00",
                 "arrival_location": "Bristol",
-                "arrival_time": "2022-10-23 19:30:00"
+                "arrival_time": "19:30:00"
             },
             {
                 "departure_location": "Bristol",
-                "departure_time": "2022-10-23 06:20:00",
+                "departure_time": "06:20:00",
                 "arrival_location": "Manchester",
-                "arrival_time": "2022-10-23 07:20:00"
+                "arrival_time": "07:20:00"
             },
             {
                 "departure_location": "Portsmouth",
-                "departure_time": "2022-10-23 12:00:00",
+                "departure_time": "12:00:00",
                 "arrival_location": "Dundee",
-                "arrival_time": "2022-10-23 14:00:00"
+                "arrival_time": "14:00:00"
             },
             {
                 "departure_location": "Dundee",
-                "departure_time": "2022-10-23 10:00:00",
+                "departure_time": "10:00:00",
                 "arrival_location": "Portsmouth",
-                "arrival_time": "2022-10-23 12:00:00"
+                "arrival_time": "12:00:00"
             },
             {
                 "departure_location": "Edinburgh",
-                "departure_time": "2022-10-23 18:30:00",
+                "departure_time": "18:30:00",
                 "arrival_location": "Cardiff",
-                "arrival_time": "2022-10-23 20:00:00"
+                "arrival_time": "20:00:00"
             },
             {
                 "departure_location": "Southampton",
-                "departure_time": "2022-10-23 12:00:00",
+                "departure_time": "12:00:00",
                 "arrival_location": "Manchester",
-                "arrival_time": "2022-10-23 13:30:00"
+                "arrival_time": "13:30:00"
             },
             {
                 "departure_location": "Manchester",
-                "departure_time": "2022-10-23 19:00:00",
+                "departure_time": "19:00:00",
                 "arrival_location": "Southampton",
-                "arrival_time": "2022-10-23 20:30:00"
+                "arrival_time": "20:30:00"
             },
             {
                 "departure_location": "Birmingham",
-                "departure_time": "2022-10-23 16:00:00",
+                "departure_time": "16:00:00",
                 "arrival_location": "Newcastle",
-                "arrival_time": "2022-10-23 17:30:00"
+                "arrival_time": "17:30:00"
             },
             {
                 "departure_location": "Newcastle",
-                "departure_time": "2022-10-23 06:00:00",
+                "departure_time": "06:00:00",
                 "arrival_location": "Birmingham",
-                "arrival_time": "2022-10-23 07:30:00"
+                "arrival_time": "07:30:00"
             },
             {
                 "departure_location": "Aberdeen",
-                "departure_time": "2022-10-23 07:00:00",
+                "departure_time": "07:00:00",
                 "arrival_location": "Portsmouth",
-                "arrival_time": "2022-10-23 09:00:00"
+                "arrival_time": "09:00:00"
             }
         ]
+
+        now = datetime.now()
+        min_date = datetime(now.year, now.month, now.day)
+        max_date = min_date + timedelta(days=180)
+
+        travel_details = travel_details = [update_travel_datetime(
+            travel_detail=travel_detail, min_date=min_date, max_date=max_date)
+            for travel_detail in travel_details]
 
         travel_details_objects = []
 
