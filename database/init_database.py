@@ -268,7 +268,7 @@ def insert_data(session=get_session()):
 
         now = datetime.now()
         min_date = datetime(now.year, now.month, now.day)
-        max_date = min_date + timedelta(days=180)
+        max_date = min_date + timedelta(days=90)
 
         travel_details = travel_details = [update_travel_datetime(
             travel_detail=travel_detail, min_date=min_date, max_date=max_date)
