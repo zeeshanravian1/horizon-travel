@@ -1,5 +1,5 @@
 """
-    Eexpense Module
+    Expense Module
 
     Description:
     - This module contains expense configuration.

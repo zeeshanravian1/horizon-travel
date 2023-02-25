@@ -7,6 +7,7 @@
 """
 
 from .auth import (auth_router)
+from .booking import (booking_router)
 from .expense import (expense_router)
 from .location import (location_router)
 from .max_seat import (max_seat_router)
