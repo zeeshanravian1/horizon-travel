@@ -37,7 +37,6 @@ app.config["CORS_METHODS"] = CORS_ALLOW_METHODS
 
 
 @app.route("/")
-@login_required
 def root():
     """
         Root
