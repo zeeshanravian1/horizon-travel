@@ -12,7 +12,7 @@ from sqlalchemy import (select, and_)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint)
+from flask import (Blueprint, request)
 
 # Importing from project files
 from database.session import (get_session)
@@ -34,11 +34,8 @@ records_router = Blueprint(
 
 
 # Create a single location
-@records_router.get("/<travel_type>/<departure_location>/<arrival_location>/")
-def get_records(
-    travel_type: str = None, departure_location: str = None, arrival_location: str = None,
-    db_session: Session = get_session()
-):
+@records_router.post("/")
+def get_records(db_session: Session = get_session()):
     """
         Get data based on user filters
 
@@ -65,9 +62,9 @@ def get_records(
     response = []
 
     try:
-        travel_type = travel_type.lower()
-        departure_location = departure_location.lower()
-        arrival_location = arrival_location.lower()
+        travel_type = request.form.get("travel_type")
+        departure_location = request.form.get("departure")
+        arrival_location = request.form.get("arrival")
 
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
@@ -84,8 +81,8 @@ def get_records(
         query = select(TravelDetailTable).where(and_(
             TravelDetailTable.is_deleted == False,
             TravelDetailTable.travel_type_id == travel_types[travel_type],
-            TravelDetailTable.departure_location_id == locations[departure_location],
-            TravelDetailTable.arrival_location_id == locations[arrival_location]))
+            TravelDetailTable.departure_location_id == locations[departure_location.lower()],
+            TravelDetailTable.arrival_location_id == locations[arrival_location.lower()]))
 
         result = db_session.execute(query).scalars().all()
 

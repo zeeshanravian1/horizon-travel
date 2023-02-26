@@ -20,6 +20,8 @@ import environs
 # Creating env object
 env = environs.Env()
 
+env.read_env('.env')
+
 
 # Reading values from environment file
 DATABASE: str = env.str("DATABASE")

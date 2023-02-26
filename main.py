@@ -36,23 +36,23 @@ app.config["CORS_ORIGINS"] = CORS_ALLOW_ORIGINS
 app.config["CORS_METHODS"] = CORS_ALLOW_METHODS
 
 
-@app.route("/")
-def root():
-    """
-        Root
+# @app.route("/")
+# def root():
+#     """
+#         Root
 
-        Description:
-        - This function is used to create the root route.
+#         Description:
+#         - This function is used to create the root route.
 
-        Parameters:
-        - **None**
+#         Parameters:
+#         - **None**
 
-        Returns:
-        - **None
+#         Returns:
+#         - **None
 
-    """
+#     """
 
-    return render_template("index.html", title=PROJECT_TITLE)
+#     return render_template("index.html", title=PROJECT_TITLE)
 
 
 # Register routers

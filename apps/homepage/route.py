@@ -11,7 +11,7 @@ from sqlalchemy import (select)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint)
+from flask import (Blueprint, render_template, request)
 
 # Importing from project files
 from database.session import (get_session)
@@ -21,7 +21,7 @@ from apps.travel_type.model import (TravelTypeTable)
 homepage_router = Blueprint(
     name="HomePage",
     import_name=__name__,
-    url_prefix="/homepage",
+    url_prefix="/",
 )
 
 
@@ -29,7 +29,7 @@ homepage_router = Blueprint(
 
 
 # Create a single location
-@homepage_router.get("/")
+@homepage_router.route("/", methods=["GET", "POST"])
 def get_homepage(
     db_session: Session = get_session()
 ):
@@ -50,7 +50,7 @@ def get_homepage(
 
     """
     print("Calling get_homepage method")
-
+    print(request.form)
     response = {}
 
     try:
@@ -71,8 +71,11 @@ def get_homepage(
 
             response["travel_types"] = travel_types
 
-        return ({"success": True, "message": "Data fetched successfully", "data": response},
-                200, {"ContentType": "application/json"})
+        return render_template("index.html",
+                departure_locations=response["departure_locations"], 
+                arrival_locations=response["arrival_locations"], 
+                travel_types=response["travel_types"]
+            )
 
     except Exception as err:
         print("error", err)
