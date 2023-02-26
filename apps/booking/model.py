@@ -33,4 +33,4 @@ class BookingTable(BaseTable):
     cost: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(Enum("success", "cancelled", name="booking_status"),
                                         nullable=False, default="success")
-    refund_amount: Mapped[float] = mapped_column(Float, nullable=True)
+    refund_amount: Mapped[float] = mapped_column(Float, nullable=True, default=0.0)
