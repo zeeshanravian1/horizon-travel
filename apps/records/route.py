@@ -69,14 +69,20 @@ def get_records(db_session: Session = get_session()):
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 
-        if result:
-            locations = {location.name.lower(): location.id for location in result}
+        if not result:
+            return ({"success": False, "message": "No locations found", "data": response},
+                    404, {"ContentType": "application/json"})
+
+        locations = {location.name.lower(): location.id for location in result}
 
         query = select(TravelTypeTable).where(TravelTypeTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 
-        if result:
-            travel_types = {travel_type.name.lower(): travel_type.id for travel_type in result}
+        if not result:
+            return ({"success": False, "message": "No travel types found", "data": response},
+                    404, {"ContentType": "application/json"})
+
+        travel_types = {travel_type.name.lower(): travel_type.id for travel_type in result}
 
         query = select(TravelDetailTable).where(and_(
             TravelDetailTable.is_deleted == False,
@@ -86,13 +92,16 @@ def get_records(db_session: Session = get_session()):
 
         result = db_session.execute(query).scalars().all()
 
-        if result:
-            travel_details = {travel_detail.id: {
-                "departure_location": departure_location.capitalize(),
-                "departure_time": travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "arrival_location": arrival_location.capitalize(),
-                "arrival_time": travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S"),
-            } for travel_detail in result}
+        if not result:
+            return ({"success": False, "message": "No travel found for this route", "data": response},
+                    404, {"ContentType": "application/json"})
+
+        travel_details = {travel_detail.id: {
+            "departure_location": departure_location.capitalize(),
+            "departure_time": travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "arrival_location": arrival_location.capitalize(),
+            "arrival_time": travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S"),
+        } for travel_detail in result}
 
         query = select(ExpenseTable).where(and_(
             ExpenseTable.is_deleted == False,
@@ -100,8 +109,11 @@ def get_records(db_session: Session = get_session()):
 
         result = db_session.execute(query).scalars().all()
 
-        if result:
-            expenses = [expense.to_dict() for expense in result]
+        if not result:
+            return ({"success": False, "message": "No expenses found", "data": response},
+                    404, {"ContentType": "application/json"})
+
+        expenses = [expense.to_dict() for expense in result]
 
         query = select(PriceCategoryTable).where(
             PriceCategoryTable.is_deleted == False,
@@ -109,8 +121,11 @@ def get_records(db_session: Session = get_session()):
 
         result = db_session.execute(query).scalars().all()
 
-        if result:
-            price_categories = {price_category.id: {
+        if not result:
+            return ({"success": False, "message": "No price categories found", "data": response},
+                    404, {"ContentType": "application/json"})
+
+        price_categories = {price_category.id: {
                 "name": price_category.name,
             } for price_category in result}
 
