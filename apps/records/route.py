@@ -35,12 +35,14 @@ records_router = Blueprint(
 
 # Create a single location
 @records_router.post("/")
-def get_records(db_session: Session = get_session()):
+def get_records(
+    db_session: Session = get_session()
+):
     """
         Get data based on user filters
 
         Description:
-        - This method is used to geta data based on user filters.
+        - This method is used to get data based on user filters.
 
         Parameters:
         - **travel_type** (STR): Travel type.
@@ -49,15 +51,17 @@ def get_records(db_session: Session = get_session()):
 
         Returns:
         Location details along with following information:
-        - **id** (INT): Id of location.
-        - **name** (STR): Name of location.
-        - **longitude** (FLOAT): Longitude of location.
-        - **latitude** (FLOAT): Latitude of location.
-        - **created_at** (DATETIME): Datetime of location creation.
-        - **updated_at** (DATETIME): Datetime of location updation.
+        - **departure_location** (STRING): Departure location.
+        - **departure_time** (STRING): Departure time.
+        - **arrival_location** (STRING): Arrival location.
+        - **arrival_time** (STRING): Arrival time.
+        - **travel_type** (STRING): Travel type.
+        - **class_type** (STRING): Class type.
+        - **cost** (FLOAT): Cost of travel.
+        - **discounted_cost** (FLOAT): Discounted cost of travel.
 
     """
-    print("Calling get_homepage method")
+    print("Calling get_records method")
 
     response = []
 

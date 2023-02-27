@@ -2,7 +2,7 @@
     Homepage Module
 
     Description:
-    - This module is responsible for getting homepage date.
+    - This module is responsible for getting homepage data.
 
 """
 
@@ -50,7 +50,7 @@ def get_homepage(
 
     """
     print("Calling get_homepage method")
-    print(request.form)
+
     response = {}
 
     try:
