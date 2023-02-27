@@ -7,6 +7,7 @@
 """
 
 # Importing Python packages
+from sqlalchemy import (select, func, desc, text)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
@@ -160,7 +161,9 @@ def get_dashboard_admin(
 
     response = {
         "bookings": [],
-        "monthly_revenue": {}
+        "monthly_revenue": {},
+        "journey_revenue": {},
+        "top_customers": []
     }
 
     try:
@@ -232,6 +235,35 @@ def get_dashboard_admin(
                     else:
                         response["monthly_revenue"][booking_detail.created_at.strftime(
                             "%B %Y")] = booking_detail.cost
+
+                    # Get journey revenue
+                    journey = f"{departure_location.name} - {arrival_location.name} by {travel_type.name}"
+                    if journey in response["journey_revenue"]:
+                        response["journey_revenue"][journey] += booking_detail.cost
+
+                    else:
+                        response["journey_revenue"][journey] = booking_detail.cost
+
+        query = """
+                    SELECT user_id, COUNT(id) as booking_count
+                    FROM horizontravels_database.booking
+                    GROUP BY user_id
+                    ORDER BY COUNT(id) DESC
+                    LIMIT 5;
+                """
+
+        query = text(query)
+
+        top_customers = db_session.execute(query).fetchall()
+
+        for customer in top_customers:
+            user = db_session.query(UserTable).filter(
+                UserTable.id == customer[0],
+                UserTable.is_deleted == False).first()
+            response["top_customers"].append({
+                "user_name": user.name,
+                "booking_count": customer[1]
+            })
 
         return ({"success": True, "message": "Dashboard data fetched successfully", "data": response},
                 200, {"ContentType": "application/json"})
