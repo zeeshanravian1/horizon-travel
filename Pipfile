@@ -17,6 +17,7 @@ pydantic = "*"
 passlib = "*"
 email-validator = "*"
 reportlab = "*"
+flask-toastr = "*"
 
 [dev-packages]
 autopep8 = "*"

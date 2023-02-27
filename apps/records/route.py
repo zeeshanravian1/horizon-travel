@@ -12,7 +12,7 @@ from sqlalchemy import (select, and_)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint, request)
+from flask import (Blueprint, request,render_template ,redirect, flash, url_for)
 
 # Importing from project files
 from database.session import (get_session)
@@ -70,6 +70,11 @@ def get_records(
         departure_location = request.form.get("departure")
         arrival_location = request.form.get("arrival")
 
+        print("travel_type: ", travel_type)
+        print("departure_location: ", departure_location)
+        print("arrival_location: ", arrival_location)
+
+
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 
@@ -97,8 +102,8 @@ def get_records(
         result = db_session.execute(query).scalars().all()
 
         if not result:
-            return ({"success": False, "message": "No travel found for this route", "data": response},
-                    404, {"ContentType": "application/json"})
+            flash("No records found")
+            return redirect(url_for("HomePage.get_homepage"))
 
         travel_details = {travel_detail.id: {
             "departure_location": departure_location.capitalize(),
@@ -162,9 +167,8 @@ def get_records(
         expenses = sorted(expenses, key=lambda k: k['cost'])
 
         response = expenses
-
-        return ({"success": True, "message": "Data fetched successfully", "data": response},
-                200, {"ContentType": "application/json"})
+        print(response)
+        return render_template("bookings_list.html", bookings=response)
 
     except Exception as err:
         print("error", err)

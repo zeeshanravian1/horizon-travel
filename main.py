@@ -12,7 +12,7 @@ import os
 
 # Importing Flask packages
 from flask import (render_template)
-from wsgi import app
+from wsgi import app, toastr
 from flask_login import login_required
 
 # Importing from project files

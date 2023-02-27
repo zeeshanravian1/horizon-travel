@@ -1,0 +1,43 @@
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+}
+body{
+background-image: url("../static/banner.jpg");    
+background-repeat: no-repeat;
+background-size: cover;
+color: white;
+    
+}
+
+
+
+.inp1{
+    width: 25%;
+    padding: 10px 20px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+    font-size: 18px;
+    
+  }
+ .label1{
+  margin: auto;
+  margin-left: 20px;
+ }
+
+ .form-btn{
+    padding: 12px 20px;
+    margin-bottom: 4px;
+    
+   
+ }
+.radio-btn {
+    display: flex;
+}
+.form-check{
+    margin-left: 50px;
+}
+ 
