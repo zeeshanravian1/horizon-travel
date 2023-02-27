@@ -18,18 +18,9 @@ from reportlab.platypus import (
 # Importing Flask packages
 
 # Importing from project files
-# from .configuration import (TABLE_STYLE)
+from .configuration import (TABLE_STYLE)
+from core import (PROJECT_TITLE)
 
-
-TABLE_STYLE = [
-    ("FONTNAME", (0, 0), (-1, -1), "Helvetica-Bold"),
-    ("TEXTCOLOR", (0, 0), (-1, -1), "#333333"),
-    ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-    ("BACKGROUND", (0, 0), (-1, 0), "#d3d3d3"),
-    ("BACKGROUND", (0, 1), (-1, -1), "#f3f3f3"),
-    ("GRID", (0, 0), (-1, -1), 1, "#999999"),
-]
 
 # --------------------------------------------------------------------------------------------------
 
@@ -75,7 +66,7 @@ def generatereport(
     # Add the header with the current datetime
     header = [
         [
-            Paragraph("<b>Travel Booking App</b>", styles["Heading1"]),
+            Paragraph(f"<b>{PROJECT_TITLE}</b>", styles["Heading1"]),
             "",
             Paragraph(datetime.now().strftime(
                 "%Y-%m-%d %H:%M"), styles["Normal"]),
