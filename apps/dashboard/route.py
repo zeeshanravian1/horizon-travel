@@ -7,12 +7,10 @@
 """
 
 # Importing Python packages
-from datetime import (datetime)
-from sqlalchemy import (select, and_)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint, request)
+from flask import (Blueprint)
 
 # Importing from project files
 from database.session import (get_session)
@@ -22,6 +20,7 @@ from apps.travel_detail.model import (TravelDetailTable)
 from apps.expense.model import (ExpenseTable)
 from apps.price_category.model import (PriceCategoryTable)
 from apps.booking.model import (BookingTable)
+from apps.user.model import (UserTable)
 
 
 dashboard_router = Blueprint(
@@ -65,6 +64,14 @@ def get_dashboard(
     response = []
 
     try:
+        # Get User Details
+        user_details = db_session.query(UserTable).filter(
+            UserTable.id == user_id).first()
+
+        if not user_details:
+            return ({"success": False, "message": "User not found", "data": response},
+                    404, {"ContentType": "application/json"})
+
         # Get al booking details based on user id
         booking_details = db_session.query(BookingTable).filter(
             BookingTable.user_id == user_id).all()

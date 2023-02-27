@@ -16,6 +16,7 @@ environs = "*"
 pydantic = "*"
 passlib = "*"
 email-validator = "*"
+reportlab = "*"
 
 [dev-packages]
 autopep8 = "*"
