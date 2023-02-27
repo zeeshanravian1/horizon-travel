@@ -6,13 +6,23 @@
 
 """
 
-import datetime
+# Importing Python packages
 from io import BytesIO
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from datetime import (datetime)
+from reportlab.lib.enums import (TA_CENTER)
+from reportlab.lib.pagesizes import (letter, landscape)
+from reportlab.lib.styles import (getSampleStyleSheet, ParagraphStyle)
+from reportlab.lib.units import (inch)
+from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle)
+
+# Importing Flask packages
+
+# Importing from project files
+from .configuration import (TABLE_STYLE)
+
+
+# --------------------------------------------------------------------------------------------------
+
 
 # Sample data for user and booking details
 user_details = [
@@ -40,7 +50,7 @@ header = [
     [
         Paragraph("<b>Travel Booking App</b>", styles["Heading1"]),
         "",
-        Paragraph(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), styles["Normal"]),
+        Paragraph(datetime.now().strftime("%Y-%m-%d %H:%M"), styles["Normal"]),
     ]
 ]
 header_table = Table(header, colWidths=[6*inch, 3*inch, 2*inch])
@@ -55,15 +65,7 @@ user_table_data = [["User Details",""]]
 for detail in user_details:
     user_table_data.append([f"{detail[0]}:", detail[1]])
 user_table = Table(user_table_data, colWidths=[3.5*inch, 4.5*inch])
-user_table.setStyle(TableStyle([
-    ("FONTNAME", (0,0), (-1,-1), "Helvetica-Bold"),
-    ("TEXTCOLOR", (0,0), (-1,-1), "#333333"),
-    ("ALIGN", (0,0), (-1,-1), "LEFT"),
-    ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
-    ("BACKGROUND", (0,0), (-1,0), "#d3d3d3"),
-    ("BACKGROUND", (0,1), (-1,-1), "#f3f3f3"),
-    ("GRID", (0,0), (-1,-1), 1, "#999999"),
-]))
+user_table.setStyle(TableStyle(TABLE_STYLE))
 
 # Add some space
 spacer = Spacer(1, 0.25*inch)
@@ -73,15 +75,7 @@ booking_table_data = [["Booking Details",""]]
 for detail in booking_details:
     booking_table_data.append([f"{detail[0]}", f"{detail[1]}"])
 booking_table = Table(booking_table_data, colWidths=[3.5*inch, 4.5*inch])
-booking_table.setStyle(TableStyle([
-    ("FONTNAME", (0,0), (-1,-1), "Helvetica-Bold"),
-    ("TEXTCOLOR", (0,0), (-1,-1), "#333333"),
-    ("ALIGN", (0,0), (-1,-1), "LEFT"),
-    ("VALIGN", (0,0), (-1,-1), "MIDDLE"),
-    ("BACKGROUND", (0,0), (-1,0), "#d3d3d3"),
-    ("BACKGROUND", (0,1), (-1,-1), "#f3f3f3"),
-    ("GRID", (0,0), (-1,-1), 1, "#999999"),
-]))
+booking_table.setStyle(TableStyle(TABLE_STYLE))
 
 # Add the user and booking tables to the PDF document
 doc.build([header_table, Spacer(0, 0.25*inch), user_table, Spacer(0, 0.5*inch), booking_table])
