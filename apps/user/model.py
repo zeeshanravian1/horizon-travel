@@ -42,7 +42,7 @@ def load_user(id):
         return session.execute(select(UserTable).where(UserTable.id == id)).scalar_one_or_none()
 
 
-class UserTable(BaseTable):
+class UserTable(BaseTable, UserMixin):
     """
         User Table
 

@@ -11,7 +11,8 @@ from sqlalchemy import (select, func, desc, text)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint)
+from flask import (Blueprint, redirect, render_template, request, url_for)
+from flask_login import (login_required, current_user)
 
 # Importing from project files
 from database.session import (get_session)
@@ -35,9 +36,10 @@ dashboard_router = Blueprint(
 
 
 # Get dashboard data for user
-@dashboard_router.get("/user/<int:user_id>/")
+@login_required
+@dashboard_router.get("/")
 def get_dashboard(
-    user_id, db_session: Session = get_session()
+    db_session: Session = get_session()
 ):
     """
         Get dashboard data based on user id
@@ -64,7 +66,14 @@ def get_dashboard(
 
     response = []
 
+    if current_user.is_authenticated:
+        user_id = current_user.id
+
+    else:
+        return redirect(url_for("AuthenticationRouter.login"))
+
     try:
+
         # Get User Details
         user_details = db_session.query(UserTable).filter(
             UserTable.id == user_id).first()
@@ -130,9 +139,10 @@ def get_dashboard(
 
 
 # get dashboard data for admin
-@dashboard_router.get("/admin/<int:admin_id>/")
+@dashboard_router.get("/admin/")
+@login_required
 def get_dashboard_admin(
-    admin_id, db_session: Session = get_session()
+    db_session: Session = get_session()
 ):
     """
         Get dashboard data based on admin id
@@ -165,6 +175,16 @@ def get_dashboard_admin(
         "journey_revenue": {},
         "top_customers": []
     }
+
+    print("current_user", current_user)
+    print("current_user.is_authenticated", current_user.is_authenticated)
+    print("current_user.is_admin", current_user.is_admin)
+
+    if current_user.is_authenticated and current_user.is_admin:
+        user_id = current_user.id
+
+    else:
+        return redirect(url_for("AuthenticationRouter.login"))
 
     try:
         # Get all users

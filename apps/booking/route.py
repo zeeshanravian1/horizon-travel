@@ -8,12 +8,14 @@
 """
 
 # Importing Python packages
+from datetime import (datetime)
 from sqlalchemy import (select, func, and_)
 from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
 # Importing Flask packages
-from flask import (Blueprint, request)
+from flask import (Blueprint, request, redirect, url_for, flash, render_template)
+from flask_login import (login_required, current_user)
 
 # Importing from project files
 from database.session import (get_session)
@@ -24,6 +26,8 @@ from ..base import (CONTENT_TYPE)
 from apps.travel_type.model import (TravelTypeTable)
 from apps.location.model import (LocationTable)
 from apps.travel_detail.model import (TravelDetailTable)
+from apps.price_category.model import (PriceCategoryTable)
+from apps.expense.model import (ExpenseTable)
 
 
 booking_router = Blueprint(
@@ -71,15 +75,46 @@ def create_booking(
 
     try:
         print(request.form['class_type_id'], request.form['travel_detail_id'])
+        
+        # get travel detail
+        travel_detail = db_session.query(TravelDetailTable).filter(
+            TravelDetailTable.id == request.form['travel_detail_id'],
+            TravelDetailTable.is_deleted == False).first()
+        
+        # Get expense
+        expense = db_session.query(ExpenseTable).filter(
+            ExpenseTable.travel_detail_id == request.form['travel_detail_id'],
+            ExpenseTable.is_deleted == False).first()
+        
+        cost = expense.cost
 
-        record = BookingTable(**request.json)
+        difference = (travel_detail.arrival_time - datetime.now()).days
+
+        if difference > 80 and difference < 90:
+            cost *= 0.8
+        elif difference > 60 and difference < 80:
+            cost *= 0.9
+        elif difference > 46 and difference < 60:
+            cost *= 0.95
+
+        # insert into booking table
+        record = BookingTable(
+            user_id=None,
+            travel_detail_id=request.form['travel_detail_id'],
+            cost=cost,
+            status="success",
+            refund_amount=0.0
+        )
 
         db_session.add(record)
         db_session.commit()
         db_session.refresh(record)
 
-        return ({"success": True, "message": "Booking created successfully",
-                 "data": record.to_dict()}, 201, CONTENT_TYPE)
+        if current_user.is_authenticated:
+            return ({"success": True, "message": "Booking created successfully",
+                     "data": record.to_dict()}, 201, CONTENT_TYPE)
+        else:
+            return redirect(url_for('AuthenticationRouter.login', booking_id=record.id))
 
     except IntegrityError as err:
         print("integrity error", err)

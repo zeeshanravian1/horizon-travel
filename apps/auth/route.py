@@ -24,6 +24,7 @@ from database.session import (get_session)
 from .exception import (PASSWORD_INCORRECT)
 from .form import (LoginForm, RegistrationForm)
 from ..user.model import (UserTable)
+from apps.booking.model import (BookingTable)
 
 
 auth_router = Blueprint(
@@ -54,35 +55,59 @@ def register(db_session: Session = get_session()):
     """
     print("Calling registration route")
 
-    register_form = RegistrationForm()
-
-    if request.method == "GET":
-        return render_template("register.html", form=register_form)
-
-    # Creating user data
-    user_data = UserTable(
-        name=register_form.name.data,
-        contact=register_form.contact.data,
-        username=register_form.username.data,
-        email=register_form.email.data,
-        password=pbkdf2_sha256.hash(register_form.password.data),
-        is_admin=False,
-    )
-
-    # Adding user data to database
-    db_session.add(user_data)
-
     try:
+        register_form = RegistrationForm()
+
+        if not register_form.validate_on_submit():
+            flash("Please fill all the fields.", "danger")
+            return render_template("register.html", form=register_form)
+
+        if request.method == "GET":
+            return render_template("register.html", form=register_form)
+
+        # Creating user data
+        user_data: UserTable = UserTable(
+            name=register_form.name.data,
+            contact=register_form.contact.data,
+            username=register_form.username.data,
+            email=register_form.email.data,
+            password=pbkdf2_sha256.hash(register_form.password.data),
+            is_admin=False,
+        )
+
+        # Adding user data to database
+        db_session.add(user_data)
         db_session.commit()
+        db_session.refresh(user_data)
+
+        booking_id = request.args.get("booking_id", None)
+
+        if booking_id:
+            booking = db_session.query(BookingTable).filter_by(id=booking_id).first()
+            booking.user_id = user_data.id
+            db_session.commit()
+
+        flash("Registered successfully.", "success")
+        return redirect(url_for("AuthenticationRouter.login"))
+
     except (IntegrityError, PendingRollbackError, InvalidRequestError,
-            StatementError, ResourceClosedError):
+            StatementError, ResourceClosedError) as err:
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )  
         db_session.rollback()
         flash("Username or email already exists.")
         return render_template("register.html", form=register_form)
 
-    flash("Registered successfully.", "success")
+    except Exception as err:
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )   
 
-    return redirect(url_for("AuthenticationRouter.login"))
 
 
 # Login Route
@@ -112,6 +137,7 @@ def login(db_session: Session = get_session()):
         return render_template("login.html", form=login_form)
 
     if not login_form.validate_on_submit():
+        flash("Invalid credentials.", "error")
         return render_template("login.html", form=login_form)
 
     print(login_form.email.data, login_form.password.data)
@@ -126,10 +152,17 @@ def login(db_session: Session = get_session()):
     if not pbkdf2_sha256.verify(login_form.password.data, user_data.password):
         flash(PASSWORD_INCORRECT, 'error')
         return render_template("login.html", form=login_form)
+    
+    booking_id = request.args.get("booking_id", None)
+
+    if booking_id:
+        booking = db_session.query(BookingTable).filter_by(id=booking_id).first()
+        booking.user_id = user_data.id
+        db_session.commit()
 
     flash("Logged in successfully.", 'success')
     login_user(user_data, remember=login_form.remember.data)
-    return redirect(url_for("root"))
+    return redirect(url_for("HomePage.get_homepage"))
 
 
 # Logout Route

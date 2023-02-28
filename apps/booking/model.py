@@ -27,7 +27,8 @@ class BookingTable(BaseTable):
         - This table is used to create booking in database.
 
     """
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=True,
+                                        default=None)
     travel_detail_id: Mapped[int] = mapped_column(Integer, ForeignKey("traveldetail.id"),
                                                   nullable=False)
     cost: Mapped[float] = mapped_column(Float, nullable=False)
