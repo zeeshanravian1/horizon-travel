@@ -267,6 +267,7 @@ def get_dashboard_admin(
         query = """
                     SELECT user_id, COUNT(id) as booking_count
                     FROM horizontravels_database.booking
+                    WHERE USER_ID IS NOT NULL
                     GROUP BY user_id
                     ORDER BY COUNT(id) DESC
                     LIMIT 5;
