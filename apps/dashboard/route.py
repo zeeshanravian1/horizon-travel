@@ -128,8 +128,7 @@ def get_dashboard(
                 "booking_id": booking_detail.id
             })
 
-        return ({"success": True, "message": "Dashboard data fetched successfully", "data": response},
-                200, {"ContentType": "application/json"})
+        return render_template('bookings_list.html', bookings=response, my_bookings=True)
 
     except Exception as err:
         print("error", err)

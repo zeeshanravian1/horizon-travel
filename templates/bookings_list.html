@@ -33,7 +33,7 @@
                             <span class="spn-price" style="text-decoration: line-through;">{{ booking.cost }}</span>
                         </div>
                         {% if my_bookings %}
-                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.id) }}" class="btn btn-sm btn-primary" >Download</a>
+                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}" class="btn btn-sm btn-primary" >Download</a>
 
                         {% else %}
                         <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">
