@@ -70,6 +70,8 @@ def create_booking(
     print("Calling create_booking method")
 
     try:
+        print(request.form['class_type_id'], request.form['travel_detail_id'])
+
         record = BookingTable(**request.json)
 
         db_session.add(record)

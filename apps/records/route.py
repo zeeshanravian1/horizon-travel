@@ -164,10 +164,15 @@ def get_records(
 
         response = expenses
 
+        print("Response: ", response)
         return render_template("bookings_list.html", bookings=response)
 
     except Exception as err:
-        print("error", err)
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})
