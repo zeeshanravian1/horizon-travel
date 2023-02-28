@@ -8,22 +8,12 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Login</title>
+    {{ toastr.include_jquery() }}
+    {{ toastr.include_toastr_css() }}
+    {{ toastr.message() }}
 </head>
 
 <body>
-    <script>
-        function showToast() {
-            // Show the toast
-            console.log("showing toast");
-            document.getElementById("myToast").classList.remove("hidden");
-            // Hide the toast after 5 seconds (5000ms)
-            // you can set a shorter/longer time by replacing "5000" with another number
-            setTimeout(function () {
-                document.getElementById("myToast").classList.add("hidden");
-            }, 5000);
-        }
-
-    </script>
     <section class="bg-gray-50 dark:bg-gray-900">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
             <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -33,25 +23,6 @@
             <div
                 class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                    {% for category, message in messages %}
-
-                    <div id="myToast"
-                        class="hidden fixed right-10 bottom-10 px-5 py-4 border-r-8 border-blue-500 bg-white drop-shadow-lg">
-                        <p class="text-sm">
-                            <!-- Polish the toast with an circle blue "i" (stands for information) -->
-                            <span
-                                class="mr-2 inline-block px-3 py-1 rounded-full bg-blue-500 text-white font-extrabold">i</span>
-                            {{ message}}
-                        </p>
-                    </div>
-                    <script>
-                        showToast();
-                    </script>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
                     <h1
                         class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                         Sign in to your account
@@ -104,6 +75,7 @@
             </div>
         </div>
     </section>
+    {{ toastr.include_toastr_js() }}
 
 </body>
 

@@ -58,12 +58,13 @@ def register(db_session: Session = get_session()):
     try:
         register_form = RegistrationForm()
 
-        if not register_form.validate_on_submit():
-            flash("Please fill all the fields.", "danger")
-            return render_template("register.html", form=register_form)
-
         if request.method == "GET":
             return render_template("register.html", form=register_form)
+
+        if not register_form.validate_on_submit():
+            flash("Please fill all the fields.", "error")
+            return render_template("register.html", form=register_form)
+
 
         # Creating user data
         user_data: UserTable = UserTable(
@@ -143,8 +144,11 @@ def login(db_session: Session = get_session()):
     print(login_form.email.data, login_form.password.data)
     # Getting user data
     query = select(UserTable).where(UserTable.email == login_form.email.data)
+    print(query)
     user_data = db_session.execute(query).scalar_one_or_none()
+
     print(user_data)
+
     if not user_data:
         flash('User not found!', 'error')
         return render_template("login.html", form=login_form)

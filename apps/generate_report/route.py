@@ -10,7 +10,7 @@
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint, make_response)
+from flask import (Blueprint, make_response, send_file)
 
 # Importing from project files
 from database.session import (get_session)
@@ -129,7 +129,9 @@ def generate_report(
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'attachment; filename={filename}'
 
-        return response
+        buffer.seek(0)
+        return send_file(buffer, as_attachment=True, download_name=filename, mimetype='application/pdf')
+
 
     except Exception as err:
         print("error", err)
