@@ -153,6 +153,8 @@ def get_records(
             elif difference > 46 and difference < 60:
                 expense["discounted_cost"] = expense["cost"] * 0.95
 
+            expense["discounted_cost"] = round(expense["discounted_cost"], 2)
+
             del expense["id"]
             del expense["is_deleted"]
             del expense["created_at"]

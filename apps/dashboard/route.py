@@ -284,7 +284,7 @@ def get_dashboard_admin(
                 "user_name": user.name,
                 "booking_count": customer[1]
             })
-        print("response", response)
+
         return render_template("admin_dashboard.html", data=response)
 
     except Exception as err:

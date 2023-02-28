@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block content %}
@@ -27,26 +26,27 @@
 				<div class="">
 					<div class="radio-btn" required>
 						{% for travel_type in travel_types %}
-							<div class="form-check">
-								<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}" id="flexRadioDefault{{loop.index}}" checked>
-								<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
+						<div class="form-check">
+							<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}"
+								id="flexRadioDefault{{loop.index}}" checked>
+							<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
 								{{ travel_type }}
-								</label>
-							</div>   
+							</label>
+						</div>
 						{% endfor %}
-					</div>   
+					</div>
 					<div class=" ">
 						<label class="label1" for="From">From</label>
 						<select id="from" class="inp1" name="departure">
 							{% for location in departure_locations %}
-								<option value="{{ location }}">{{ location }}</option>
+							<option value="{{ location }}">{{ location }}</option>
 							{% endfor %}
 						</select>
-						
+
 						<label class="label1" for="From">To</label>
 						<select id="to" class="inp1" name="arrival">
 							{% for location in arrival_locations %}
-								<option value="{{ location }}">{{ location }}</option>
+							<option value="{{ location }}">{{ location }}</option>
 							{% endfor %}
 							<script>
 								updateArrivalOptions();
@@ -55,7 +55,7 @@
 
 						<button class="btn btn-primary form-btn" type="submit">Search</button>
 					</div>
-				
+
 				</div>
 			</form>
 		</div>

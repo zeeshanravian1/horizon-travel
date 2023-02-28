@@ -8,7 +8,7 @@
     {% endif %}
     <div class="row">
 
-        {% for booking in bookings  %}
+        {% for booking in bookings %}
 
         <div class="col-sm-4 col-lg-12 mt-2">
             <div class="col-sm-4 col-lg-12 mt-2 mb-2">
@@ -33,26 +33,24 @@
                             <span class="spn-price" style="text-decoration: line-through;">{{ booking.cost }}</span>
                         </div>
                         {% if my_bookings %}
-                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}" class="btn btn-sm btn-primary" >Download</a>
+                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
+                            class="btn btn-sm btn-primary">Download</a>
 
                         {% else %}
                         <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">
                             <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
                             <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
-                            <button type="submit" class="btn btn-sm btn-primary" >Book</button>
+                            <button type="submit" class="btn btn-sm btn-primary">Book</button>
                         </form>
                         {% endif %}
                     </div>
                 </div>
-        {% endfor %}
+                {% endfor %}
+            </div>
+
+        </div>
+
     </div>
-
-</div>
-
-
-
-
-</div>
 </div>
 
 {% endblock %}
