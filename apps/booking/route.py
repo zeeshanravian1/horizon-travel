@@ -179,9 +179,8 @@ def get_booking(
 
 
 # Get all bookings route
-@booking_router.get("/")
+@booking_router.route("/", methods=["GET"])
 def get_all_bookings(
-    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -208,19 +207,27 @@ def get_all_bookings(
     """
     print("Calling get_all_bookings method")
 
+    if not current_user.is_authenticated:
+        return redirect(url_for('AuthenticationRouter.login'))
+
+    page = request.args.get('page', None)
+    limit = request.args.get('limit', None)
+
     query = select(func.count(BookingTable.id)).where(
         BookingTable.is_deleted == False)
     result = db_session.execute(query)
     total_count = result.scalar()
 
-    query = select(BookingTable).where(BookingTable.is_deleted == False)
+    query = select(BookingTable).where(BookingTable.is_deleted == False, 
+                                       BookingTable.user_id == current_user.id)
 
     if page and limit:
         query = select(BookingTable).where(and_(
-            BookingTable.is_deleted == False, BookingTable.id > (page - 1) * limit)).limit(limit)
+            BookingTable.is_deleted == False, BookingTable.user_id == current_user.id, 
+            BookingTable.id > (page - 1) * limit)).limit(limit)
 
     result = db_session.execute(query).scalars().all()
-
+    print(result)
     if not result:
         return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
@@ -229,10 +236,7 @@ def get_all_bookings(
         page = 1
         limit = total_count
 
-    return ({"success": True, "message": "Bookings fetched successfully",
-             "data": {"total": total_count, "page": page, "limit": limit,
-                      "items": [booking.to_dict() for booking in result]}},
-            200, CONTENT_TYPE)
+    return render_template('bookings_list.html', bookings=result, my_bookings=True)
 
 
 # Update a single booking route

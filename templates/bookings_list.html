@@ -1,28 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <div class="row le-hide">
-
-        <div class="col-lg-12">
-            <div class="m-0 row p-3">
-                <div class="col-md-3 col-lg-2 p-0">
-                    <strong class="pl-lg-2"> Class</strong>
-                </div>
-                <div class="col-sm-12 col-lg-3 p-0 pl-lg-5">
-                    <strong> Deaprture</strong>
-                </div>
-                <div class="col-sm-12 col-lg-3 p-0 pl-lg-5">
-                    <strong>Arrival</strong>
-                </div>
-                <div class="col-sm-12 col-lg-3 p-0 pl-lg-5">
-                    <strong>Price</strong>
-                </div>
-
-            </div>
-        </div>
-
-
-    </div>
+    {% if my_bookings %}
+    <h1 class="text-center">My Bookings</h1>
+    {% else %}
+    <h1 class="text-center">Bookings</h1>
+    {% endif %}
     <div class="row">
 
         {% for booking in bookings  %}
@@ -49,11 +32,16 @@
 
                             <span class="spn-price" style="text-decoration: line-through;">{{ booking.cost }}</span>
                         </div>
+                        {% if my_bookings %}
+                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.id) }}" class="btn btn-sm btn-primary" >Download</a>
+
+                        {% else %}
                         <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">
                             <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
                             <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
                             <button type="submit" class="btn btn-sm btn-primary" >Book</button>
-                         </form>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
         {% endfor %}
