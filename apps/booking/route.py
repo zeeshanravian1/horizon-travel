@@ -470,7 +470,7 @@ def create_booking_by_locations(
 
 
 # Cancel booking by id
-@booking_router.put("/cancel/<int:booking_id>/")
+@booking_router.get("/cancel/<int:booking_id>/")
 def cancel_booking(
     booking_id: int, db_session: Session = get_session()
 ):
@@ -511,5 +511,6 @@ def cancel_booking(
 
     db_session.commit()
 
-    return ({"success": True, "message": "booking cancelled successfully",
-             "refund_amount": result.refund_amount}, 200, CONTENT_TYPE)
+    flash(message="Booking cancelled successfully", category="success")
+
+    return redirect(url_for("BookingRouter.get_all_bookings"))

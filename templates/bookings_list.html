@@ -48,9 +48,14 @@
                         {% if my_bookings %}
                         <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
                             class="btn btn-sm btn-primary mb-3 pt-2">Download</a>
+                        
+                        {% if booking.status == 'cancelled' %}
+                            <a href="" class="btn btn-sm btn-danger  btn-cancel disabled">Cancelled</a>
+                        
+                        {% else %}
+                            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-danger  btn-cancel">Cancel</a>
 
-                        <a href="#"
-                            class="btn btn-sm btn-danger  btn-cancel">Cancel</a>
+                        {% endif %}
 
                         {% else %}
                         <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">

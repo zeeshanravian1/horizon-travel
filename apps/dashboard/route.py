@@ -124,9 +124,11 @@ def get_dashboard(
                 "travel_type": travel_type.name,
                 "class_type": price_category.name,
                 "cost": booking_detail.cost,
-                "booking_id": booking_detail.id
+                "booking_id": booking_detail.id,
+                "status": booking_detail.status
             })
 
+        print("response", response)
         return render_template('bookings_list.html', bookings=response, my_bookings=True)
 
     except Exception as err:
