@@ -467,3 +467,49 @@ def create_booking_by_locations(
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
+
+
+# Cancel booking by id
+@booking_router.put("/cancel/<int:booking_id>/")
+def cancel_booking(
+    booking_id: int, db_session: Session = get_session()
+):
+    """
+        Cancel booking by id.
+
+        Description:
+        - This method is used to cancel booking by id.
+
+        Parameters:
+        - **booking_id** (INT): ID of booking to be cancelled. *--Required*
+
+        Returns:
+        - **message** (STR): booking cancelled successfully.
+
+    """
+    print("Calling cancel_booking method")
+
+    query = select(BookingTable).where(and_(BookingTable.id == booking_id,
+                                            BookingTable.is_deleted == False))
+
+    result = db_session.execute(query).scalar_one_or_none()
+
+    if result is None:
+        return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
+                404, CONTENT_TYPE)
+
+    result.status = "cancelled"
+
+    time_difference = (datetime.now() - result.created_at).days
+    
+    if time_difference > 60:
+        result.refund_amount = result.cost
+    elif time_difference > 30:
+        result.refund_amount = result.cost * 0.5
+    else:
+        result.refund_amount = 0.0
+
+    db_session.commit()
+
+    return ({"success": True, "message": "booking cancelled successfully",
+             "refund_amount": result.refund_amount}, 200, CONTENT_TYPE)
