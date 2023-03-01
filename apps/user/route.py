@@ -11,15 +11,18 @@
 from sqlalchemy import (select, func, and_)
 from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
+from passlib.hash import (pbkdf2_sha256)
 
 # Importing Flask packages
-from flask import (Blueprint, request)
+from flask import (Blueprint, request, render_template, flash, redirect, url_for)
+from flask_login import (login_required, current_user)
 
 # Importing from project files
 from database.session import (get_session)
 from .exception import (USER_NOT_FOUND)
 from .model import (UserTable)
 from ..base import (CONTENT_TYPE)
+from .form import (UpdateProfileForm)
 
 
 user_router = Blueprint(
@@ -33,9 +36,10 @@ user_router = Blueprint(
 
 
 # Get a single user route
-@user_router.get("/<int:user_id>/")
+@user_router.get("/profile/")
+@login_required
 def get_user(
-    user_id: int, db_session: Session = get_session()
+    db_session: Session = get_session()
 ):
     """
         Get a single user.
@@ -61,7 +65,10 @@ def get_user(
     """
     print("Calling get_user method")
 
-    query = select(UserTable).where(and_(UserTable.id == user_id,
+    form = UpdateProfileForm()
+
+
+    query = select(UserTable).where(and_(UserTable.id == current_user.id,
                                          UserTable.is_deleted == False))
 
     record = db_session.execute(statement=query).scalar_one_or_none()
@@ -70,8 +77,13 @@ def get_user(
         return ({"success": False, "message": USER_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
 
-    return ({"success": True, "message": "User fetched successfully", "data": record.to_dict()},
-            200, CONTENT_TYPE)
+    form.username.data = record.username
+    form.name.data = record.name
+    form.contact.data = record.contact
+    form.email.data = record.email
+
+    return render_template("profile.html", form=form, user=current_user)
+
 
 
 # Get all users route
@@ -132,9 +144,10 @@ def get_all_users(
 
 
 # Update a single user route
-@user_router.put("/<int:user_id>/")
+@user_router.route("/update/", methods=["POST"])
+@login_required
 def update_user(
-    user_id: int, db_session: Session = get_session()
+    db_session: Session = get_session()
 ):
     """
         Update a single user.
@@ -166,7 +179,10 @@ def update_user(
     print("Calling update_user method")
 
     try:
-        query = select(UserTable).where(and_(UserTable.id == user_id,
+
+        form = UpdateProfileForm()
+
+        query = select(UserTable).where(and_(UserTable.id == current_user.id,
                                              UserTable.is_deleted == False))
 
         result = db_session.execute(query).scalar_one_or_none()
@@ -174,26 +190,19 @@ def update_user(
         if result is None:
             return ({"success": False, "message": USER_NOT_FOUND, "data": None},
                     404, CONTENT_TYPE)
-        
-        if result.email == request.json["email"]:
-            return ({"success": False, "message": "Email already exists", "data": None},
-                    409, CONTENT_TYPE)
-        
-        if result.username == request.json["username"]:
-            return ({"success": False, "message": "Username already exists", "data": None},
-                    409, CONTENT_TYPE)
 
-        result.name = request.json.get("name", result.name)
-        result.contact = request.json.get("contact", result.contact)
-        result.username = request.json.get("username", result.username)
-        result.email = request.json.get("email", result.email)
-        result.password = request.json.get("password", result.password)
-        result.is_admin = request.json.get("is_admin", result.is_admin)
+        result.name = form.name.data
+        result.contact = form.contact.data
+        result.username = form.username.data
+        result.email = form.email.data
+        if form.password.data:
+            result.password = pbkdf2_sha256.hash(form.password.data)
 
+        db_session.add(result)
         db_session.commit()
 
-        return ({"success": True, "message": "user updated successfully", "data": result.to_dict()},
-                200, CONTENT_TYPE)
+        flash("Profile updated successfully", "success")
+        return redirect(url_for("HomePage.get_homepage"))
 
     except IntegrityError as err:
         print("integrity error", err)
