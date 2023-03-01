@@ -87,8 +87,7 @@ def get_dashboard(
             BookingTable.user_id == user_id).all()
 
         if not booking_details:
-            return ({"success": False, "message": "No bookings found", "data": response},
-                    404, {"ContentType": "application/json"})
+            return render_template('bookings_list.html', bookings=[], my_bookings=True)
 
         # Loop through all booking details
         for booking_detail in booking_details:

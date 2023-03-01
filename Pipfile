@@ -18,6 +18,7 @@ passlib = "*"
 email-validator = "*"
 reportlab = "*"
 flask-toastr = "*"
+colorama = "*"
 
 [dev-packages]
 autopep8 = "*"

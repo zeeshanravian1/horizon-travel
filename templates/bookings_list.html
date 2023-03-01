@@ -1,48 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    {% if my_bookings %}
+    <div class="headings mt-4">
+        {% if my_bookings %}
+        <h1 class="">My Bookings</h1>
+        {% else %}
+        <h1 class="">Bookings</h1>
+        {% endif %}
+    </div>
+    <!-- {% if my_bookings %}
     <h1 class="text-center">My Bookings</h1>
     {% else %}
-    <h1 class="text-center">Bookings</h1>
-    {% endif %}
+    <h1 class="main-h1">Bookings</h1>
+    {% endif %} -->
     <div class="row">
 
         {% for booking in bookings %}
 
-        <div class="col-sm-4 col-lg-12 mt-2">
-            <div class="col-sm-4 col-lg-12 mt-2 mb-2">
+        <div class="col-sm-12 col-lg-12 mt-2 d-flex">
+            <div class="col-sm-12 col-lg-12 mt-2 mb-2">
                 <div class="m-0 row row-container bg-white p-3">
-                    <div class="col-md-3 col-lg-2 p-0 pl-lg-2">
+                    <div class="col-md-2 col-lg-2 col-sm-3 ">
                         <h5>{{ booking.class_type }}</h5>
                     </div>
-                    <div class="col-sm-12 col-lg-3  p-0 p-0 pl-lg-5">
-                        <h5 class="">{{ booking.departure_location }}</h5>
+                    <div class=" col-xl-3 col-md-3 col-sm-3">
+                        <h5 class=" ">{{ booking.departure_location }}</h5>
                         <h6>{{ booking.departure_time }}</h6>
                     </div>
-                    <div class="col-sm-12 col-lg-3 p-0 p-0 pl-lg-5">
+                    <div class=" col-xl-3 col-sm-3   ">
                         <h5>{{ booking.arrival_location }}</h5>
                         <h6>{{ booking.arrival_time }}</h6>
                     </div>
-                    <div class="col-sm-12 col-lg-3 p-0 p-0 pl-lg-5 d-flex">
+                    <div class="col-xl-3 col-sm-3 col-md-4 d-flex">
                         <span class="spn-price ">from</span>
                         <div class="">
 
+                            {% if my_bookings %}
+                            <h6>{{ booking.cost }}</h6>
+
+                            {% else %}
                             <h6>{{ booking.discounted_cost }}</h6>
 
                             <span class="spn-price" style="text-decoration: line-through;">{{ booking.cost }}</span>
-                        </div>
+                            {% endif %}
+
+
                         {% if my_bookings %}
                         <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
-                            class="btn btn-sm btn-primary">Download</a>
+                            class="btn btn-sm btn-primary mb-3 pt-2">Download</a>
+
+                        <a href="#"
+                            class="btn btn-sm btn-danger  btn-cancel">Cancel</a>
 
                         {% else %}
                         <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">
                             <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
                             <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
-                            <button type="submit" class="btn btn-sm btn-primary">Book</button>
+                            <button type="submit" class="btn btn-sm btn-primary ">Book</button>
                         </form>
                         {% endif %}
+                        </div>
+
                     </div>
                 </div>
                 {% endfor %}

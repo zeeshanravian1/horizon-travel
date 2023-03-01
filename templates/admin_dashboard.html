@@ -6,7 +6,7 @@
   <div class="row mt-4">
     <div class="col-12">
       <div class="row">
-        <div class="col-4">
+        <div class=" col-md-4 col-lg-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title text-center">Journey Revenue</h5>
@@ -21,7 +21,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4">
+        <div class=" admin-dcard col-md-4 col-lg-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title text-center">Monthly Revenue</h5>
@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4">
+        <div class="admin-dcard col-md-4 col-lg-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title text-center">Top customers</h5>
@@ -65,29 +65,30 @@
 
     {% for booking in data.bookings %}
 
-    <div class="col-sm-4 col-lg-12 mt-2">
-      <div class="col-sm-4 col-lg-12 mt-2 mb-2">
+    <div class="col-sm-12 col-lg-12 mt-2">
+      <div class="col-sm-12 col-lg-12 mt-2 mb-2">
         <div class="m-0 row row-container bg-white p-3">
-          <div class="col-md-3 col-lg-2 p-0 pl-lg-2">
+          <div class="col-md-2 col-lg-2 col-sm-3 ">
             <h5>{{ booking.class_type | capitalize }}</h5>
           </div>
-          <div class="col-sm-12 col-lg-3  p-0 p-0 pl-lg-5">
+          <div class="col-xl-3 col-md-3 col-sm-3 ">
             <h5 class="">{{ booking.departure_location }}</h5>
             <h6>{{ booking.departure_time }}</h6>
           </div>
-          <div class="col-sm-12 col-lg-3 p-0 p-0 pl-lg-5">
+          <div class="col-xl-3 col-sm-3  ">
             <h5>{{ booking.arrival_location }}</h5>
             <h6>{{ booking.arrival_time }}</h6>
           </div>
-          <div class="col-sm-12 col-lg-3 p-0 p-0 pl-lg-5 d-flex">
+          <div class="col-xl-3 col-md-4 col-sm-3  d-flex">
             <span class="spn-price ">from</span>
-            <div class="">
+            <div class="col-2">
 
               <h6>{{ booking.cost }}</h6>
-
+              
             </div>
             <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
-              class="btn btn-sm btn-primary">Download</a>
+            class="btn btn-sm dwn-btn btn-primary">Download</a>   
+            
           </div>
         </div>
         {% endfor %}
