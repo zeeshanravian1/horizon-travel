@@ -85,7 +85,8 @@ def get_homepage(
                 
                 departure_locations=response["departure_locations"],
                 arrival_locations=response["arrival_locations"],
-                travel_types=response["travel_types"]
+                travel_types=response["travel_types"],
+                response={}
             )
 
     except Exception as err:
