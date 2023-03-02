@@ -76,18 +76,18 @@
 					<div class="col">
 						<label for="datePicker1" class="form-label">Departure Date:</label>
 						{% if response %}
-						<input type="datetime-local" class="form-control" id="datePicker1" name="departure_time" required
+						<input type="date" class="form-control" id="datePicker1" name="departure_time" required
 						value="{{ response.departure_time }}">
 						{% else %}
-						<input type="datetime-local" class="form-control" id="datePicker1" name="departure_time" required>
+						<input type="date" class="form-control" id="datePicker1" name="departure_time" required>
 						{% endif %}
 
 						<label for="datePicker2" class=" form-label">Arrival Date:</label>
 						{% if response %}
-						<input type="datetime-local" class="form-control" id="datePicker2" name="arrival_time" required
+						<input type="date" class="form-control" id="datePicker2" name="arrival_time" required
 							value="{{ response.arrival_time }}">
 						{% else %}
-						<input type="datetime-local" class="form-control" id="datePicker2" name="arrival_time" required>
+						<input type="date" class="form-control" id="datePicker2" name="arrival_time" required>
 						{% endif %}
 
 					</div>
@@ -104,5 +104,24 @@
 	$(document).ready(function () {
 		$('#from').change(updateArrivalOptions);
 	});
+
+	var radios = document.getElementsByName('travel_type');
+
+	var checked = false;
+
+	for (var i = 0, length = radios.length; i < length; i++) {
+		if (radios[i].checked) {
+			// do whatever you want with the checked radio
+			checked = true;
+
+			// only one radio can be logically checked, don't check the rest
+			break;
+		}
+	}
+
+	if (!checked) {
+		radios[0].checked = true;
+	}
+
 </script>
 {% endblock %}
