@@ -25,42 +25,42 @@
 			{% if current_user.is_admin and update_booking %}
 			<form action="{{ url_for('BookingRouter.update_booking', booking_id=booking_id) }}" method="post">
 
-			{% else%}
-			<form action="{{ url_for('Records.get_records') }}" method="post">
-			{% endif %}
-				<div class="">
-					<div class="radio-btn" required>
+				{% else%}
+				<form action="{{ url_for('Records.get_records') }}" method="post">
+					{% endif %}
+					<div class="">
+						<div class="radio-btn" required>
 
-						{% for travel_type in travel_types %}
-						<div class="form-check">
-							{% if response.travel_type == travel_type %}
-							<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}"
-								id="flexRadioDefault{{loop.index}}" checked>
-							{% else %}
-							<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}"
-								id="flexRadioDefault{{loop.index}}">
-							{% endif %}
-							<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
-								{{ travel_type }}
-							</label>
+							{% for travel_type in travel_types %}
+							<div class="form-check">
+								{% if response.travel_type == travel_type %}
+								<input name="travel_type" class="form-check-input" type="radio"
+									value="{{ travel_type }}" id="flexRadioDefault{{loop.index}}" checked>
+								{% else %}
+								<input name="travel_type" class="form-check-input" type="radio"
+									value="{{ travel_type }}" id="flexRadioDefault{{loop.index}}">
+								{% endif %}
+								<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
+									{{ travel_type }}
+								</label>
+							</div>
+							{% endfor %}
 						</div>
-						{% endfor %}
-					</div>
-					<div class="row mb-4">
+						<div class="row mb-4">
 
-						<div class="col">
-							<label class="form-label" for="From">From</label>
-							<select id="from" class="form-control" name="departure" required>
+							<div class="col">
+								<label class="form-label" for="From">From</label>
+								<select id="from" class="form-control" name="departure" required>
 
-								{% for location in departure_locations %}
+									{% for location in departure_locations %}
 									{% if response.departure_locations == location %}
 
 									<option value="{{ location }}" selected>{{ location }}</option>
 									{% else %}
 									<option value="{{ location }}">{{ location }}</option>
 									{% endif %}
-								{% endfor %}
-							</select>
+									{% endfor %}
+								</select>
 
 								<label class="form-label" for="From">To</label>
 								<select id="to" class="form-control" name="arrival" required>
@@ -71,39 +71,39 @@
 									{% else %}
 									<option value="{{ location }}">{{ location }}</option>
 									{% endif %}
-								{% endfor %}
-								<script>
-									updateArrivalOptions();
+									{% endfor %}
+									<script>
+										updateArrivalOptions();
 									</script>
-							</select>
+								</select>
+							</div>
+
+							<div class="col">
+								<label for="datePicker1" class="form-label">Departure Date:</label>
+								{% if response %}
+								<input type="date" class="form-control" id="datePicker1" name="departure_time" required
+									value="{{ response.departure_time }}">
+								{% else %}
+								<input type="date" class="form-control" id="datePicker1" name="departure_time" required>
+								{% endif %}
+
+
+								{% if current_user.is_admin and update_bookings is sameas true %}
+								<label for="users" class="form-label">Users:</label>
+								<select id="users" class="form-control" name="user" required>
+									{% for user in users %}
+									<option value="{{ user.id }}">{{ user.name }}</option>
+									{% endfor %}
+								</select>
+								{% endif %}
+
+							</div>
+
 						</div>
-
-					<div class="col">
-						<label for="datePicker1" class="form-label">Departure Date:</label>
-						{% if response %}
-						<input type="date" class="form-control" id="datePicker1" name="departure_time" required
-						value="{{ response.departure_time }}">
-						{% else %}
-						<input type="date" class="form-control" id="datePicker1" name="departure_time" required>
-						{% endif %}
-
-
-						{% if current_user.is_admin and update_bookings is sameas true %}
-						<label for="users" class="form-label">Users:</label>
-						<select id="users" class="form-control" name="user" required>
-							{% for user in users %}
-								<option value="{{ user.id }}">{{ user.name }}</option>
-							{% endfor %}
-						</select>
-						{% endif %}
+						<button class="btn btn-primary form-btn" type="submit">Search</button>
 
 					</div>
-
-					</div>
-					<button class="btn btn-primary form-btn" type="submit">Search</button>
-
-				</div>
-			</form>
+				</form>
 		</div>
 	</div>
 </div>

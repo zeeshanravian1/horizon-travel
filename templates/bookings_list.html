@@ -44,29 +44,30 @@
                             <span class="spn-price" style="text-decoration: line-through;">{{ booking.cost }}</span>
                             {% endif %}
 
+                            {% if my_bookings %}
+                            <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
+                                class="btn btn-sm btn-primary mb-3 pt-2">Download</a>
 
-                        {% if my_bookings %}
-                        <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
-                            class="btn btn-sm btn-primary mb-3 pt-2">Download</a>
-                        
-                        {% if booking.status == 'cancelled' %}
+                            {% if booking.status == 'cancelled' %}
                             <a href="" class="btn btn-sm btn-danger  btn-cancel disabled">Cancelled</a>
-                        
-                        {% else %}
-                            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-info btn-cancel">Update</a>
 
-                            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-danger btn-cancel">Cancel</a>
+                            {% else %}
+                            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}"
+                                class="btn btn-sm btn-info btn-cancel">Update</a>
 
-                        {% endif %}
+                            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
+                                class="btn btn-sm btn-danger btn-cancel">Cancel</a>
 
-                        {% else %}
-                        
-                        <form method="POST" action="{{ url_for('BookingRouter.create_booking', user_id=user) }}">
-                            <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
-                            <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
-                            <button type="submit" class="btn btn-sm btn-primary ">Book</button>
-                        </form>
-                        {% endif %}
+                            {% endif %}
+
+                            {% else %}
+
+                            <form method="POST" action="{{ url_for('BookingRouter.create_booking', user_id=user) }}">
+                                <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
+                                <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
+                                <button type="submit" class="btn btn-sm btn-primary ">Book</button>
+                            </form>
+                            {% endif %}
                         </div>
 
                     </div>
