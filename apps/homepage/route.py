@@ -74,18 +74,14 @@ def get_homepage(
 
         query = select(UserTable).where(UserTable.is_deleted == False,
                                         UserTable.username != "admin")
-        result = db_session.execute(query).scalars().all()
-
-        if result:
-            users = [user.name for user in result]
-
-            response["users"] = users
+        users = db_session.execute(query).scalars().all()
 
         return render_template("index.html",
                 
                 departure_locations=response["departure_locations"],
                 arrival_locations=response["arrival_locations"],
                 travel_types=response["travel_types"],
+                users=users,
                 response={}
             )
 

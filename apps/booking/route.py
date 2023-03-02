@@ -76,8 +76,6 @@ def create_booking(
     print("Calling create_booking method")
 
     try:
-        print(request.form['class_type_id'], request.form['travel_detail_id'])
-
         # get travel detail
         travel_detail = db_session.query(TravelDetailTable).filter(
             TravelDetailTable.id == request.form['travel_detail_id'],
@@ -118,9 +116,21 @@ def create_booking(
                 refund_amount=0.0
             )
 
+        if current_user.is_authenticated and current_user.is_admin:
+            record = BookingTable(
+                user_id=request.args.get("user_id"),
+                travel_detail_id=request.form['travel_detail_id'],
+                cost=cost,
+                status="success",
+                refund_amount=0.0
+            )
+
         db_session.add(record)
         db_session.commit()
         db_session.refresh(record)
+
+        if current_user.is_authenticated and current_user.is_admin:
+            return redirect(url_for('dashboard.get_dashboard_admin'))
 
         if current_user.is_authenticated:
             return redirect(url_for('dashboard.get_dashboard'))
@@ -142,7 +152,11 @@ def create_booking(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -238,7 +252,6 @@ def get_all_bookings(
             BookingTable.id > (page - 1) * limit)).limit(limit)
 
     result = db_session.execute(query).scalars().all()
-    print(result)
     if not result:
         return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
                 404, CONTENT_TYPE)
@@ -355,7 +368,8 @@ def update_booking(
                                    departure_locations=[
                                        location.name for location in all_locations],
                                    arrival_locations=[
-                                       location.name for location in all_locations]
+                                       location.name for location in all_locations],
+                                    update_booking=True
                                    )
 
         if request.method == "POST":
@@ -380,17 +394,17 @@ def update_booking(
             query = select(TravelDetailTable).where(and_(
                 TravelDetailTable.departure_location_id == locations[0].id,
                 TravelDetailTable.arrival_location_id == locations[1].id,
-                TravelDetailTable.departure_time == form.departure_time.data,
-                TravelDetailTable.arrival_time == form.arrival_time.data,
+                TravelDetailTable.departure_time >= datetime.combine(form.departure_time.data, datetime.min.time()),
+                TravelDetailTable.departure_time <= datetime.combine(form.departure_time.data, datetime.max.time()),
                 TravelDetailTable.travel_type_id == travel_type.id,
                 TravelDetailTable.is_deleted == False))
 
             travel_detail = db_session.execute(
                 statement=query).scalar_one_or_none()
 
-            if travel_detail is None:
-                return ({"success": False, "message": "No travel available for given details", "data": None},
-                        404, CONTENT_TYPE)
+            if not travel_detail:
+                flash("No travel detail found for given details")
+                return redirect(url_for("BookingRouter.update_booking", booking_id=booking_id))
 
             # get expense
             query = select(ExpenseTable).where(and_(ExpenseTable.travel_detail_id == travel_detail.id,
@@ -408,16 +422,6 @@ def update_booking(
                 cost *= 0.9
             elif difference > 46 and difference < 60:
                 cost *= 0.95
-
-            # get booking details
-            query = select(BookingTable).where(and_(BookingTable.id == booking_id,
-                                                    BookingTable.is_deleted == False))
-
-            booking = db_session.execute(statement=query).scalar_one_or_none()
-
-            if booking is None:
-                return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
-                        404, CONTENT_TYPE)
 
             # update booking
             query = update(BookingTable).where(BookingTable.id == booking_id).values(

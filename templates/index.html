@@ -82,17 +82,19 @@
 						<input type="date" class="form-control" id="datePicker1" name="departure_time" required>
 						{% endif %}
 
-						<!-- <label for="datePicker2" class=" form-label">Arrival Date:</label>
-						{% if response %}
-						<input type="date" class="form-control" id="datePicker2" name="arrival_time" required
-							value="{{ response.arrival_time }}">
-						{% else %}
-						<input type="date" class="form-control" id="datePicker2" name="arrival_time" required>
-						{% endif %} -->
+
+						{% if current_user.is_admin %}
+						<label for="users" class="form-label">Users:</label>
+						<select id="users" class="form-control" name="user" required>
+							{% for user in users %}
+								<option value="{{ user.id }}">{{ user.name }}</option>
+							{% endfor %}
+						</select>
+						{% endif %}
 
 					</div>
 
-				</div>
+					</div>
 					<button class="btn btn-primary form-btn" type="submit">Search</button>
 
 				</div>

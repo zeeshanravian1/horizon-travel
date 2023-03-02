@@ -181,7 +181,9 @@ def get_records(
 
         response = expenses
 
-        return render_template("bookings_list.html", bookings=response)
+        return render_template("bookings_list.html",
+                               bookings=response,
+                               user=request.form.get("user"))
 
     except Exception as err:
         print(

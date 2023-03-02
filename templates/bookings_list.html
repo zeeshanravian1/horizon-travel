@@ -60,7 +60,8 @@
                         {% endif %}
 
                         {% else %}
-                        <form method="POST" action="{{ url_for('BookingRouter.create_booking') }}">
+                        
+                        <form method="POST" action="{{ url_for('BookingRouter.create_booking', user_id=user) }}">
                             <input type="hidden" name="class_type_id" value="{{ booking.class_type_id }}">
                             <input type="hidden" name="travel_detail_id" value="{{ booking.travel_detail_id }}">
                             <button type="submit" class="btn btn-sm btn-primary ">Book</button>
