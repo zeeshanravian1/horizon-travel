@@ -366,4 +366,4 @@ def insert_data(session=get_session()):
         session.commit()
 
     except Exception as err:
-        print(err)
+        pass

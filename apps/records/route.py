@@ -12,7 +12,8 @@ from sqlalchemy import (select, and_)
 from sqlalchemy.orm import (Session)
 
 # Importing Flask packages
-from flask import (Blueprint, request, render_template, redirect, flash, url_for)
+from flask import (Blueprint, request, render_template,
+                   redirect, flash, url_for)
 
 # Importing from project files
 from database.session import (get_session)
@@ -70,33 +71,36 @@ def get_records(
         departure_location = request.form.get("departure")
         arrival_location = request.form.get("arrival")
         departure_time = request.form.get("departure_time")
-        arrival_time = request.form.get("arrival_time")
-        print(departure_time, arrival_time)
+
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 
         if not result:
-            return ({"success": False, "message": "No locations found", "data": response},
-                    404, {"ContentType": "application/json"})
+            flash("No locations found available for the given details.")
+            return redirect(url_for("HomePage.get_homepage"))
 
         locations = {location.name.lower(): location.id for location in result}
 
-        query = select(TravelTypeTable).where(TravelTypeTable.is_deleted == False)
+        query = select(TravelTypeTable).where(
+            TravelTypeTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 
         if not result:
-            return ({"success": False, "message": "No travel types found", "data": response},
-                    404, {"ContentType": "application/json"})
+            flash("No No travel types found available for the given details.")
+            return redirect(url_for("HomePage.get_homepage"))
 
-        travel_types = {travel_type.name.lower(): travel_type.id for travel_type in result}
+        travel_types = {travel_type.name.lower(
+        ): travel_type.id for travel_type in result}
 
         query = select(TravelDetailTable).where(and_(
             TravelDetailTable.is_deleted == False,
             TravelDetailTable.travel_type_id == travel_types[travel_type],
             TravelDetailTable.departure_location_id == locations[departure_location.lower()],
             TravelDetailTable.arrival_location_id == locations[arrival_location.lower()],
-            TravelDetailTable.departure_time == departure_time,
-            TravelDetailTable.arrival_time == arrival_time))
+            TravelDetailTable.departure_time >= datetime.combine(
+                datetime.strptime(departure_time, "%Y-%m-%d"), datetime.min.time()),
+            TravelDetailTable.departure_time <= datetime.combine(
+                datetime.strptime(departure_time, "%Y-%m-%d"), datetime.max.time())))
 
         result = db_session.execute(query).scalars().all()
 
@@ -134,21 +138,28 @@ def get_records(
                     404, {"ContentType": "application/json"})
 
         price_categories = {price_category.id: {
-                "price_category_id": price_category.id,
-                "name": price_category.name,
-            } for price_category in result}
+            "price_category_id": price_category.id,
+            "name": price_category.name,
+        } for price_category in result}
 
         for expense in expenses:
             expense["travel_type"] = travel_type.capitalize()
-            expense["class_type_id"] = price_categories[expense["price_category_id"]]["price_category_id"]
-            expense["class_type"] = price_categories[expense["price_category_id"]]["name"].capitalize()
-            expense["departure_location"] = travel_details[expense["travel_detail_id"]]["departure_location"]
-            expense["departure_time"] = travel_details[expense["travel_detail_id"]]["departure_time"]
-            expense["arrival_location"] = travel_details[expense["travel_detail_id"]]["arrival_location"]
-            expense["arrival_time"] = travel_details[expense["travel_detail_id"]]["arrival_time"]
+            expense["class_type_id"] = price_categories[expense["price_category_id"]
+                                                        ]["price_category_id"]
+            expense["class_type"] = price_categories[expense["price_category_id"]
+                                                     ]["name"].capitalize()
+            expense["departure_location"] = travel_details[expense["travel_detail_id"]
+                                                           ]["departure_location"]
+            expense["departure_time"] = travel_details[expense["travel_detail_id"]
+                                                       ]["departure_time"]
+            expense["arrival_location"] = travel_details[expense["travel_detail_id"]
+                                                         ]["arrival_location"]
+            expense["arrival_time"] = travel_details[expense["travel_detail_id"]
+                                                     ]["arrival_time"]
             expense["discounted_cost"] = expense["cost"]
 
-            difference = (datetime.strptime(expense["arrival_time"], "%Y-%m-%d %H:%M:%S") - datetime.now()).days
+            difference = (datetime.strptime(
+                expense["arrival_time"], "%Y-%m-%d %H:%M:%S") - datetime.now()).days
 
             if difference > 80 and difference < 90:
                 expense["discounted_cost"] = expense["cost"] * 0.8
