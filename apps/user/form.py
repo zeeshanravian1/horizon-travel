@@ -43,5 +43,3 @@ class UpdateProfileForm(FlaskForm):
     password = PasswordField('Password', validators=[])
     confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password')])
     submit = SubmitField('Update Profile')
-
-

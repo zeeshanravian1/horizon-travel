@@ -69,6 +69,8 @@ def get_records(
         travel_type = request.form.get("travel_type")
         departure_location = request.form.get("departure")
         arrival_location = request.form.get("arrival")
+        departure_time = request.form.get("departure_time")
+        arrival_time = request.form.get("arrival_time")
 
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
@@ -92,12 +94,14 @@ def get_records(
             TravelDetailTable.is_deleted == False,
             TravelDetailTable.travel_type_id == travel_types[travel_type],
             TravelDetailTable.departure_location_id == locations[departure_location.lower()],
-            TravelDetailTable.arrival_location_id == locations[arrival_location.lower()]))
+            TravelDetailTable.arrival_location_id == locations[arrival_location.lower()],
+            TravelDetailTable.departure_time == departure_time,
+            TravelDetailTable.arrival_time == arrival_time))
 
         result = db_session.execute(query).scalars().all()
 
         if not result:
-            flash("No records found")
+            flash("No flights available for the given details.")
             return redirect(url_for("HomePage.get_homepage"))
 
         travel_details = {travel_detail.id: {

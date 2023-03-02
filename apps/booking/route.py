@@ -9,7 +9,7 @@
 
 # Importing Python packages
 from datetime import (datetime)
-from sqlalchemy import (select, func, and_)
+from sqlalchemy import (select, update, func, and_)
 from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
@@ -22,6 +22,7 @@ from database.session import (get_session)
 from .exception import (BOOKING_NOT_FOUND)
 from .model import (BookingTable)
 from ..base import (CONTENT_TYPE)
+from .form import (UpdateBookingForm)
 
 from apps.travel_type.model import (TravelTypeTable)
 from apps.location.model import (LocationTable)
@@ -75,17 +76,17 @@ def create_booking(
 
     try:
         print(request.form['class_type_id'], request.form['travel_detail_id'])
-        
+
         # get travel detail
         travel_detail = db_session.query(TravelDetailTable).filter(
             TravelDetailTable.id == request.form['travel_detail_id'],
             TravelDetailTable.is_deleted == False).first()
-        
+
         # Get expense
         expense = db_session.query(ExpenseTable).filter(
             ExpenseTable.travel_detail_id == request.form['travel_detail_id'],
             ExpenseTable.is_deleted == False).first()
-        
+
         cost = expense.cost
 
         difference = (travel_detail.arrival_time - datetime.now()).days
@@ -106,13 +107,22 @@ def create_booking(
             refund_amount=0.0
         )
 
+        if current_user.is_authenticated:
+            # insert into booking table
+            record = BookingTable(
+                user_id=current_user.id,
+                travel_detail_id=request.form['travel_detail_id'],
+                cost=cost,
+                status="success",
+                refund_amount=0.0
+            )
+
         db_session.add(record)
         db_session.commit()
         db_session.refresh(record)
 
         if current_user.is_authenticated:
-            return ({"success": True, "message": "Booking created successfully",
-                     "data": record.to_dict()}, 201, CONTENT_TYPE)
+            return redirect(url_for('dashboard.get_dashboard'))
         else:
             return redirect(url_for('AuthenticationRouter.login', booking_id=record.id))
 
@@ -218,12 +228,12 @@ def get_all_bookings(
     result = db_session.execute(query)
     total_count = result.scalar()
 
-    query = select(BookingTable).where(BookingTable.is_deleted == False, 
+    query = select(BookingTable).where(BookingTable.is_deleted == False,
                                        BookingTable.user_id == current_user.id)
 
     if page and limit:
         query = select(BookingTable).where(and_(
-            BookingTable.is_deleted == False, BookingTable.user_id == current_user.id, 
+            BookingTable.is_deleted == False, BookingTable.user_id == current_user.id,
             BookingTable.id > (page - 1) * limit)).limit(limit)
 
     result = db_session.execute(query).scalars().all()
@@ -240,7 +250,7 @@ def get_all_bookings(
 
 
 # Update a single booking route
-@booking_router.put("/<int:booking_id>/")
+@booking_router.route("/<int:booking_id>/", methods=["POST", "GET"])
 def update_booking(
     booking_id: int, db_session: Session = get_session()
 ):
@@ -273,27 +283,128 @@ def update_booking(
     print("Calling update_booking method")
 
     try:
-        query = select(BookingTable).where(and_(BookingTable.id == booking_id,
-                                                BookingTable.is_deleted == False))
+        if request.method == "GET":
+            response = {}
+            form = UpdateBookingForm()
 
-        result = db_session.execute(query).scalar_one_or_none()
+            query = select(BookingTable).where(and_(BookingTable.id == booking_id,
+                                                    BookingTable.is_deleted == False))
 
-        if result is None:
-            return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
-                    404, CONTENT_TYPE)
+            record = db_session.execute(statement=query).scalar_one_or_none()
 
-        result.user_id = request.json.get("user_id", result.user_id)
-        result.travel_detail_id = request.json.get(
-            "travel_detail_id", result.travel_detail_id)
-        result.cost = request.json.get("cost", result.cost)
-        result.status = request.json.get("status", result.status)
-        result.refund_amount = request.json.get(
-            "refund_amount", result.refund_amount)
+            if record is None:
+                return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
+                        404, CONTENT_TYPE)
 
-        db_session.commit()
+            # get travel details
+            query = select(TravelDetailTable).where(and_(TravelDetailTable.id == record.travel_detail_id,
+                                                    TravelDetailTable.is_deleted == False))
 
-        return ({"success": True, "message": "Booking updated successfully", "data": result.to_dict()},
-                200, CONTENT_TYPE)
+            travel_detail = db_session.execute(
+                statement=query).scalar_one_or_none()
+
+            # get travel type
+            query = select(TravelTypeTable).where(and_(TravelTypeTable.id == travel_detail.travel_type_id,
+                                                    TravelTypeTable.is_deleted == False))
+
+            travel_type = db_session.execute(
+                statement=query).scalar_one_or_none()
+
+            # get departure and arrival locations
+            query = select(LocationTable). \
+                where(and_(LocationTable.id.in_(
+                    [travel_detail.departure_location_id, travel_detail.arrival_location_id]),
+                    LocationTable.is_deleted == False))
+
+            locations = db_session.execute(statement=query).scalars().all()
+
+            form.travel_type.data = travel_type.name
+            form.departure_location.data = locations[0].name
+            form.arrival_location.data = locations[1].name
+            form.departure_time.data = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
+            form.arrival_time.data = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
+
+            response["travel_type"] = travel_type.name
+            response["departure_location"] = locations[0].name
+            response["arrival_location"] = locations[1].name
+            response["departure_time"] = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
+            response["arrival_time"] = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
+
+            return ({"success": True, "message": "Booking details fetched successfully", "data": response},
+                    200, CONTENT_TYPE)
+        
+        if request.method == "POST":
+            form = UpdateBookingForm(request.form)
+            
+            # get location ids
+            query = select(LocationTable). \
+                where(and_(LocationTable.name.in_(
+                    [form.departure_location.data, form.arrival_location.data]),
+                    LocationTable.is_deleted == False))
+            
+            locations = db_session.execute(statement=query).scalars().all()
+
+            # get travel type id
+            query = select(TravelTypeTable).where(and_(TravelTypeTable.name == form.travel_type.data,
+                                                    TravelTypeTable.is_deleted == False))
+            
+            travel_type = db_session.execute(
+                statement=query).scalar_one_or_none()
+            
+            # get travel detail id
+            query = select(TravelDetailTable).where(and_(TravelDetailTable.departure_location_id == locations[0].id,
+                                                        TravelDetailTable.arrival_location_id == locations[1].id,
+                                                        TravelDetailTable.departure_time == form.departure_time.data,
+                                                        TravelDetailTable.arrival_time == form.arrival_time.data,
+                                                        TravelDetailTable.travel_type_id == travel_type.id,
+                                                        TravelDetailTable.is_deleted == False))
+            
+            travel_detail = db_session.execute(
+                statement=query).scalar_one_or_none()
+            
+            if travel_detail is None:
+                return ({"success": False, "message": "No travel available for given details", "data": None},
+                        404, CONTENT_TYPE)
+            
+            # get expense
+            query = select(ExpenseTable).where(and_(ExpenseTable.travel_detail_id == travel_detail.id,
+                                                    ExpenseTable.is_deleted == False))
+            
+            expense = db_session.execute(statement=query).scalar_one_or_none()
+
+            cost = expense.cost
+
+            difference = (travel_detail.arrival_time - datetime.now()).days
+
+            if difference > 80 and difference < 90:
+                cost *= 0.8
+            elif difference > 60 and difference < 80:
+                cost *= 0.9
+            elif difference > 46 and difference < 60:
+                cost *= 0.95
+            
+            # get booking details
+            query = select(BookingTable).where(and_(BookingTable.id == booking_id,
+                                                    BookingTable.is_deleted == False))
+            
+            booking = db_session.execute(statement=query).scalar_one_or_none()
+
+            if booking is None:
+                return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
+                        404, CONTENT_TYPE)
+            
+            # update booking
+            query = update(BookingTable).where(BookingTable.id == booking_id).values(
+                travel_detail_id=travel_detail.id,
+                cost=cost,
+                status="success",
+            )
+
+            db_session.execute(statement=query)
+            db_session.commit()
+
+            return ({"success": True, "message": "Booking updated successfully", "data": None},
+                    200, CONTENT_TYPE)
 
     except IntegrityError as err:
         print("integrity error", err)
@@ -310,7 +421,11 @@ def update_booking(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
@@ -440,13 +555,12 @@ def create_booking_by_locations(
                                cost=travel.get("cost"),
                                status="success",
                                refund_amount=0.0)
-        
+
         db_session.add(booking)
         db_session.commit()
 
         return ({"success": True, "message": "Booking created successfully",
                  "data": booking.to_dict()}, 200, CONTENT_TYPE)
-                
 
     except IntegrityError as err:
         print("integrity error", err)
@@ -501,7 +615,7 @@ def cancel_booking(
     result.status = "cancelled"
 
     time_difference = (datetime.now() - result.created_at).days
-    
+
     if time_difference > 60:
         result.refund_amount = result.cost
     elif time_difference > 30:
@@ -513,4 +627,4 @@ def cancel_booking(
 
     flash(message="Booking cancelled successfully", category="success")
 
-    return redirect(url_for("BookingRouter.get_all_bookings"))
+    return redirect(url_for("dashboard.get_dashboard"))
