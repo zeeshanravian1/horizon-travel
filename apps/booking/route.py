@@ -14,7 +14,8 @@ from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
 # Importing Flask packages
-from flask import (Blueprint, request, redirect, url_for, flash, render_template)
+from flask import (Blueprint, request, redirect,
+                   url_for, flash, render_template)
 from flask_login import (login_required, current_user)
 
 # Importing from project files
@@ -306,7 +307,7 @@ def update_booking(
 
             # get travel type
             query = select(TravelTypeTable).where(and_(TravelTypeTable.id == travel_detail.travel_type_id,
-                                                    TravelTypeTable.is_deleted == False))
+                                                       TravelTypeTable.is_deleted == False))
 
             travel_type = db_session.execute(
                 statement=query).scalar_one_or_none()
@@ -322,8 +323,10 @@ def update_booking(
             form.travel_type.data = travel_type.name
             form.departure_location.data = locations[0].name
             form.arrival_location.data = locations[1].name
-            form.departure_time.data = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
-            form.arrival_time.data = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
+            form.departure_time.data = travel_detail.departure_time.strftime(
+                "%Y-%m-%d %H:%M:%S")
+            form.arrival_time.data = travel_detail.arrival_time.strftime(
+                "%Y-%m-%d %H:%M:%S")
 
             query = select(LocationTable)
 
@@ -331,61 +334,68 @@ def update_booking(
 
             query = select(TravelTypeTable)
 
-            all_travel_type = db_session.execute(statement=query).scalars().all()
+            all_travel_type = db_session.execute(
+                statement=query).scalars().all()
 
             response["travel_type"] = travel_type.name
             response["departure_locations"] = locations[0].name
             response["arrival_locations"] = locations[1].name
-            response["departure_time"] = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
-            response["arrival_time"] = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
+            response["departure_time"] = travel_detail.departure_time.strftime(
+                "%Y-%m-%d %H:%M:%S")
+            response["arrival_time"] = travel_detail.arrival_time.strftime(
+                "%Y-%m-%d %H:%M:%S")
             response["all_locations"] = all_locations
             response["all_travel_type"] = all_travel_type
 
-            return render_template("index.html", 
-                form=form, 
-                response=response,
-                travel_types=[travel_type.name for travel_type in all_travel_type], 
-                departure_locations=[location.name for location in all_locations],
-                arrival_locations=[location.name for location in all_locations]
-            )
-        
+            return render_template("index.html",
+                                   form=form,
+                                   response=response,
+                                   travel_types=[
+                                       travel_type.name for travel_type in all_travel_type],
+                                   departure_locations=[
+                                       location.name for location in all_locations],
+                                   arrival_locations=[
+                                       location.name for location in all_locations]
+                                   )
+
         if request.method == "POST":
             form = UpdateBookingForm(request.form)
-            
+
             # get location ids
             query = select(LocationTable). \
                 where(and_(LocationTable.name.in_(
                     [form.departure_location.data, form.arrival_location.data]),
                     LocationTable.is_deleted == False))
-            
+
             locations = db_session.execute(statement=query).scalars().all()
 
             # get travel type id
             query = select(TravelTypeTable).where(and_(TravelTypeTable.name == form.travel_type.data,
-                                                    TravelTypeTable.is_deleted == False))
-            
+                                                       TravelTypeTable.is_deleted == False))
+
             travel_type = db_session.execute(
                 statement=query).scalar_one_or_none()
-            
+
             # get travel detail id
-            query = select(TravelDetailTable).where(and_(TravelDetailTable.departure_location_id == locations[0].id,
-                                                        TravelDetailTable.arrival_location_id == locations[1].id,
-                                                        TravelDetailTable.departure_time == form.departure_time.data,
-                                                        TravelDetailTable.arrival_time == form.arrival_time.data,
-                                                        TravelDetailTable.travel_type_id == travel_type.id,
-                                                        TravelDetailTable.is_deleted == False))
-            
+            query = select(TravelDetailTable).where(and_(
+                TravelDetailTable.departure_location_id == locations[0].id,
+                TravelDetailTable.arrival_location_id == locations[1].id,
+                TravelDetailTable.departure_time == form.departure_time.data,
+                TravelDetailTable.arrival_time == form.arrival_time.data,
+                TravelDetailTable.travel_type_id == travel_type.id,
+                TravelDetailTable.is_deleted == False))
+
             travel_detail = db_session.execute(
                 statement=query).scalar_one_or_none()
-            
+
             if travel_detail is None:
                 return ({"success": False, "message": "No travel available for given details", "data": None},
                         404, CONTENT_TYPE)
-            
+
             # get expense
             query = select(ExpenseTable).where(and_(ExpenseTable.travel_detail_id == travel_detail.id,
                                                     ExpenseTable.is_deleted == False))
-            
+
             expense = db_session.execute(statement=query).scalar_one_or_none()
 
             cost = expense.cost
@@ -398,17 +408,17 @@ def update_booking(
                 cost *= 0.9
             elif difference > 46 and difference < 60:
                 cost *= 0.95
-            
+
             # get booking details
             query = select(BookingTable).where(and_(BookingTable.id == booking_id,
                                                     BookingTable.is_deleted == False))
-            
+
             booking = db_session.execute(statement=query).scalar_one_or_none()
 
             if booking is None:
                 return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
                         404, CONTENT_TYPE)
-            
+
             # update booking
             query = update(BookingTable).where(BookingTable.id == booking_id).values(
                 travel_detail_id=travel_detail.id,
