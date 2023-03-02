@@ -71,7 +71,7 @@ def get_records(
         arrival_location = request.form.get("arrival")
         departure_time = request.form.get("departure_time")
         arrival_time = request.form.get("arrival_time")
-
+        print(departure_time, arrival_time)
         query = select(LocationTable).where(LocationTable.is_deleted == False)
         result = db_session.execute(query).scalars().all()
 

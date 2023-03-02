@@ -148,10 +148,10 @@ def create_booking(
 
 
 # Get a single booking route
-@booking_router.get("/<int:booking_id>/")
-def get_booking(
-    booking_id: int, db_session: Session = get_session()
-):
+# @booking_router.get("/<int:booking_id>/")
+# def get_booking(
+#     booking_id: int, db_session: Session = get_session()
+# ):
     """
         Get a single booking.
 
@@ -250,7 +250,8 @@ def get_all_bookings(
 
 
 # Update a single booking route
-@booking_router.route("/<int:booking_id>/", methods=["POST", "GET"])
+@booking_router.route("/update/<int:booking_id>/", methods=["POST", "GET"])
+@login_required
 def update_booking(
     booking_id: int, db_session: Session = get_session()
 ):
@@ -324,14 +325,29 @@ def update_booking(
             form.departure_time.data = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
             form.arrival_time.data = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
 
+            query = select(LocationTable)
+
+            all_locations = db_session.execute(statement=query).scalars().all()
+
+            query = select(TravelTypeTable)
+
+            all_travel_type = db_session.execute(statement=query).scalars().all()
+
             response["travel_type"] = travel_type.name
-            response["departure_location"] = locations[0].name
-            response["arrival_location"] = locations[1].name
+            response["departure_locations"] = locations[0].name
+            response["arrival_locations"] = locations[1].name
             response["departure_time"] = travel_detail.departure_time.strftime("%Y-%m-%d %H:%M:%S")
             response["arrival_time"] = travel_detail.arrival_time.strftime("%Y-%m-%d %H:%M:%S")
+            response["all_locations"] = all_locations
+            response["all_travel_type"] = all_travel_type
 
-            return ({"success": True, "message": "Booking details fetched successfully", "data": response},
-                    200, CONTENT_TYPE)
+            return render_template("index.html", 
+                form=form, 
+                response=response,
+                travel_types=[travel_type.name for travel_type in all_travel_type], 
+                departure_locations=[location.name for location in all_locations],
+                arrival_locations=[location.name for location in all_locations]
+            )
         
         if request.method == "POST":
             form = UpdateBookingForm(request.form)

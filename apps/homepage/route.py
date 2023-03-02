@@ -82,8 +82,9 @@ def get_homepage(
             response["users"] = users
 
         return render_template("index.html",
-                departure_locations=response["departure_locations"], 
-                arrival_locations=response["arrival_locations"], 
+                
+                departure_locations=response["departure_locations"],
+                arrival_locations=response["arrival_locations"],
                 travel_types=response["travel_types"]
             )
 

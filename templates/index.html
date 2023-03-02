@@ -25,36 +25,75 @@
 			<form action="{{ url_for('Records.get_records') }}" method="post">
 				<div class="">
 					<div class="radio-btn" required>
+
 						{% for travel_type in travel_types %}
 						<div class="form-check">
+							{% if response.travel_type == travel_type %}
 							<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}"
 								id="flexRadioDefault{{loop.index}}" checked>
+							{% else %}
+							<input name="travel_type" class="form-check-input" type="radio" value="{{ travel_type }}"
+								id="flexRadioDefault{{loop.index}}">
+							{% endif %}
 							<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
 								{{ travel_type }}
 							</label>
 						</div>
 						{% endfor %}
 					</div>
-					<div class=" ">
-						<label class="label1" for="From">From</label>
-						<select id="from" class="inp1" name="departure">
-							{% for location in departure_locations %}
-							<option value="{{ location }}">{{ location }}</option>
-							{% endfor %}
-						</select>
+					<div class="row mb-4">
 
-						<label class="label1" for="From">To</label>
-						<select id="to" class="inp1" name="arrival">
-							{% for location in arrival_locations %}
-							<option value="{{ location }}">{{ location }}</option>
-							{% endfor %}
-							<script>
-								updateArrivalOptions();
-							</script>
-						</select>
+						<div class="col">
+							<label class="form-label" for="From">From</label>
+							<select id="from" class="form-control" name="departure" selected="" required>
 
-						<button class="btn btn-primary form-btn" type="submit">Search</button>
+								{% for location in departure_locations %}
+									{% if response.departure_locations == location %}
+
+									<option value="{{ location }}" selected>{{ location }}</option>
+									{% else %}
+									<option value="{{ location }}">{{ location }}</option>
+									{% endif %}
+								{% endfor %}
+							</select>
+
+								<label class="form-label" for="From">To</label>
+								<select id="to" class="form-control" name="arrival" required>
+									{% for location in arrival_locations %}
+									{% if response.arrival_locations == location %}
+
+									<option value="{{ location }}" selected>{{ location }}</option>
+									{% else %}
+									<option value="{{ location }}">{{ location }}</option>
+									{% endif %}
+								{% endfor %}
+								<script>
+									updateArrivalOptions();
+									</script>
+							</select>
+						</div>
+
+					<div class="col">
+						<label for="datePicker1" class="form-label">Departure Date:</label>
+						{% if response %}
+						<input type="datetime-local" class="form-control" id="datePicker1" name="departure_time" required
+						value="{{ response.departure_time }}">
+						{% else %}
+						<input type="datetime-local" class="form-control" id="datePicker1" name="departure_time" required>
+						{% endif %}
+
+						<label for="datePicker2" class=" form-label">Arrival Date:</label>
+						{% if response %}
+						<input type="datetime-local" class="form-control" id="datePicker2" name="arrival_time" required
+							value="{{ response.arrival_time }}">
+						{% else %}
+						<input type="datetime-local" class="form-control" id="datePicker2" name="arrival_time" required>
+						{% endif %}
+
 					</div>
+
+				</div>
+					<button class="btn btn-primary form-btn" type="submit">Search</button>
 
 				</div>
 			</form>

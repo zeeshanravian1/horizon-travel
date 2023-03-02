@@ -53,7 +53,9 @@
                             <a href="" class="btn btn-sm btn-danger  btn-cancel disabled">Cancelled</a>
                         
                         {% else %}
-                            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-danger  btn-cancel">Cancel</a>
+                            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-info btn-cancel">Update</a>
+
+                            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}" class="btn btn-sm btn-danger btn-cancel">Cancel</a>
 
                         {% endif %}
 
