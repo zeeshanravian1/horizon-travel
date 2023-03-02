@@ -22,7 +22,12 @@
 <div class="container di mt-5">
 	<div class="row">
 		<div class="col-12">
+			{% if current_user.is_admin and update_booking %}
+			<form action="{{ url_for('BookingRouter.update_booking', booking_id=booking_id) }}" method="post">
+
+			{% else%}
 			<form action="{{ url_for('Records.get_records') }}" method="post">
+			{% endif %}
 				<div class="">
 					<div class="radio-btn" required>
 
@@ -45,7 +50,7 @@
 
 						<div class="col">
 							<label class="form-label" for="From">From</label>
-							<select id="from" class="form-control" name="departure" selected="" required>
+							<select id="from" class="form-control" name="departure" required>
 
 								{% for location in departure_locations %}
 									{% if response.departure_locations == location %}
@@ -83,7 +88,7 @@
 						{% endif %}
 
 
-						{% if current_user.is_admin %}
+						{% if current_user.is_admin and update_bookings is sameas true %}
 						<label for="users" class="form-label">Users:</label>
 						<select id="users" class="form-control" name="user" required>
 							{% for user in users %}

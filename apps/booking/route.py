@@ -360,6 +360,12 @@ def update_booking(
             response["all_locations"] = all_locations
             response["all_travel_type"] = all_travel_type
 
+
+            print("form", form)
+            print("response", response)
+            print("all_travel_type", all_travel_type)
+            print("all_locations", all_locations)
+
             return render_template("index.html",
                                    form=form,
                                    response=response,
@@ -369,11 +375,19 @@ def update_booking(
                                        location.name for location in all_locations],
                                    arrival_locations=[
                                        location.name for location in all_locations],
-                                    update_booking=True
+                                    update_booking=True,
+                                    booking_id=booking_id
                                    )
 
         if request.method == "POST":
             form = UpdateBookingForm(request.form)
+            print(
+                request.form.get("travel_type"),
+                request.form.get("departure"),
+                request.form.get("arrival"),
+                request.form.get("departure_time"),
+            )
+
 
             # get location ids
             query = select(LocationTable). \
@@ -457,6 +471,8 @@ def update_booking(
             err.__traceback__.tb_lineno  # 2
         )
         db_session.rollback()
+        raise err
+
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
 
