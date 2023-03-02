@@ -17,6 +17,7 @@ from flask import (Blueprint, render_template, request)
 from database.session import (get_session)
 from apps.location.model import (LocationTable)
 from apps.travel_type.model import (TravelTypeTable)
+from apps.user.model import (UserTable)
 
 homepage_router = Blueprint(
     name="HomePage",
@@ -70,6 +71,15 @@ def get_homepage(
             travel_types = [travel_type.name for travel_type in result]
 
             response["travel_types"] = travel_types
+
+        query = select(UserTable).where(UserTable.is_deleted == False,
+                                        UserTable.username != "admin")
+        result = db_session.execute(query).scalars().all()
+
+        if result:
+            users = [user.name for user in result]
+
+            response["users"] = users
 
         return render_template("index.html",
                 departure_locations=response["departure_locations"], 
