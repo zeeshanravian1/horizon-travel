@@ -70,8 +70,36 @@ def create_travel_detail(
     """
 
     try:
-        form = TravelDetailForm(request.form)
+        if request.method == "GET":
+            response = {}
+            
+            # get all locations
+            query = select(LocationTable).where(LocationTable.is_deleted == False)
 
+            locations = db_session.execute(statement=query).scalars().all()
+            locations = [{"id": location.id, "name": location.name} for location in locations]
+
+            response["locations"] = locations
+
+            # get all travel types
+            query = select(TravelTypeTable).where(TravelTypeTable.is_deleted == False)
+
+            travel_types = db_session.execute(statement=query).scalars().all()
+            travel_types = [{"id": travel_type.id, "name": travel_type.name} for travel_type in travel_types]
+
+            response["travel_types"] = travel_types
+
+            return render_template("newtravels.html", response=response, create_travel=True)
+
+        else:
+            print(
+                request.form.get("departure_location"),
+                request.form.get("arrival_location"),
+                request.form.get("travel_type"),
+                request.form.get("departure_time"),
+                request.form.get("arrival_time"),
+                request.form.get("expense")
+            )
         # get location ids
         query = select(LocationTable). \
             where(and_(LocationTable.name.in_(
@@ -131,6 +159,7 @@ def create_travel_detail(
 
     except Exception as err:
         db_session.rollback()
+        raise err
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
 
