@@ -69,14 +69,51 @@ def create_travel_detail(
     """
 
     try:
-        record = TravelDetailTable(**request.json)
+        form = TravelDetailForm(request.form)
+
+        # get location ids
+        query = select(LocationTable). \
+            where(and_(LocationTable.name.in_(
+                [request.form.get("departure_location"),
+                    request.form.get("arrival_location")]),
+                LocationTable.is_deleted == False))
+
+        locations = db_session.execute(statement=query).scalars().all()
+
+        # get travel type id
+        query = select(TravelTypeTable).where(and_(TravelTypeTable.name == form.travel_type.data,
+                                                    TravelTypeTable.is_deleted == False))
+
+        travel_type = db_session.execute(
+            statement=query).scalar_one_or_none()
+        
+        record = TravelDetailTable(
+            travel_type_id=travel_type.id,
+            departure_location_id=locations[0].id,
+            departure_time=form.departure_time.data,
+            arrival_location_id=locations[1].id,
+            arrival_time=form.arrival_time.data
+        )
 
         db_session.add(record)
         db_session.commit()
-        db_session.refresh(record)
 
-        return ({"success": True, "message": "Travel detail created successfully",
-                 "data": record.to_dict()}, 201, CONTENT_TYPE)
+        # get inserted record
+        query = select(TravelDetailTable).where(and_(TravelDetailTable.id == record.id,
+                                                    TravelDetailTable.is_deleted == False))
+        
+        record = db_session.execute(statement=query).scalar_one_or_none()
+
+        expense_record = ExpenseTable(
+            travel_detail_id=record.id,
+            amount=request.form.get("cost")
+        )
+
+        db_session.add(expense_record)
+        db_session.commit()
+
+        return ({"success": True, "message": "Travel detail created successfully"},
+                201, CONTENT_TYPE)
 
     except IntegrityError as err:
         db_session.rollback()
