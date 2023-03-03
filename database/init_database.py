@@ -346,6 +346,14 @@ def insert_data(session=get_session()):
                         dic["cost"] = round(expense["expense"] / 3, 2)
                     break
 
+            else:
+                if travel_detail["travel_type_id"] == 1:
+                    dic["cost"] = 75
+                elif travel_detail["travel_type_id"] == 2:
+                    dic["cost"] = round(75 * 2.5, 2)
+                elif travel_detail["travel_type_id"] == 3:
+                    dic["cost"] = round(75 / 3, 2)
+
             expenses_objects.append(dic)
 
         expenses_objects_2x = []
