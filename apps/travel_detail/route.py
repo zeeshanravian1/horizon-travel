@@ -14,6 +14,7 @@ from sqlalchemy.exc import (IntegrityError)
 
 # Importing Flask packages
 from flask import (Blueprint, request, flash, render_template, redirect, url_for)
+from flask_login import (login_required, current_user)
 
 # Importing from project files
 from database.session import (get_session)
@@ -213,6 +214,7 @@ def get_all_travel_categories(
 
 # Update a single travel detail route
 @travel_detail_router.route("/<int:travel_detail_id>/", methods=["GET", "POST"])
+@login_required
 def update_travel_detail(
     travel_detail_id: int, db_session: Session = get_session()
 ):
@@ -244,13 +246,17 @@ def update_travel_detail(
     """
 
     try:
+        if not current_user.is_admin:
+            return ({"success": False, "message": "You are not authorized to perform this action", "data": None},
+                    401, CONTENT_TYPE)
+
         if request.method == "GET":
             response = {}
             form = TravelDetailForm(request.form)
 
             query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
                                                             TravelDetailTable.is_deleted == False))
-            
+
             travel_detail = db_session.execute(query).scalar_one_or_none()
 
             if travel_detail is None:
@@ -287,6 +293,49 @@ def update_travel_detail(
             return ({"success": True, "message": "Travel detail fetched successfully",
                      "data": response}, 200, CONTENT_TYPE)
         
+        if request.method == "POST":
+            form = TravelDetailForm(request.form)
+            
+            # get location ids
+            query = select(LocationTable). \
+                where(and_(LocationTable.name.in_(
+                    [request.form.get("departure_location"),
+                     request.form.get("arrival_location")]),
+                    LocationTable.is_deleted == False))
+
+            locations = db_session.execute(statement=query).scalars().all()
+
+            # get travel type id
+            query = select(TravelTypeTable).where(and_(TravelTypeTable.name == form.travel_type.data,
+                                                       TravelTypeTable.is_deleted == False))
+
+            travel_type = db_session.execute(
+                statement=query).scalar_one_or_none()
+            
+            
+            query = update(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
+                                                            TravelDetailTable.is_deleted == False)). \
+                    values(travel_type_id=travel_type.id,
+                        departure_location_id=locations[0].id,
+                        departure_time=form.departure_time.data,
+                        arrival_location_id=locations[1].id,
+                        arrival_time=form.arrival_time.data)
+            
+            db_session.execute(query)
+            db_session.commit()
+
+            # update expense
+            query = update(ExpenseTable).where(and_(ExpenseTable.travel_detail_id == travel_detail_id,
+                                                    ExpenseTable.is_deleted == False)). \
+                    values(cost=form.expense.data)
+            
+            db_session.execute(query)
+            db_session.commit()
+
+            return ({"success": True, "message": "Travel detail updated successfully",
+                     "data": None}, 200, CONTENT_TYPE)
+
+
     except IntegrityError as err:
         db_session.rollback()
         if err.orig.args[0] == 1062:

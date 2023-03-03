@@ -198,6 +198,8 @@ def update_user(
         db_session.add(result)
         db_session.commit()
 
+        db_session.close()
+
         flash("Profile updated successfully", "success")
         return redirect(url_for("HomePage.get_homepage"))
 
