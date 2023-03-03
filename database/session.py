@@ -18,7 +18,7 @@ from .connection import (engine)
 # --------------------------------------------------------------------------------------------------
 
 
-SessionLocal: Session = sessionmaker(autocommit=False, autoflush=True, bind=engine)
+SessionLocal: Session = sessionmaker(autoflush=True, bind=engine, expire_on_commit=True)
 
 
 def get_session():

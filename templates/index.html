@@ -22,7 +22,7 @@
 <div class="container di mt-5">
 	<div class="row">
 		<div class="col-12">
-			{% if current_user.is_admin and update_booking %}
+			{% if current_user.is_admin or update_booking %}
 			<form action="{{ url_for('BookingRouter.update_booking', booking_id=booking_id) }}" method="post">
 
 				{% else%}
