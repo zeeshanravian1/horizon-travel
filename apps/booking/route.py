@@ -73,7 +73,6 @@ def create_booking(
         - **updated_at** (DATETIME): Datetime of booking updation.
 
     """
-    print("Calling create_booking method")
 
     try:
         # get travel detail
@@ -138,7 +137,6 @@ def create_booking(
             return redirect(url_for('AuthenticationRouter.login', booking_id=record.id))
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Booking already exists", "data": None},
@@ -152,11 +150,7 @@ def create_booking(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print(
-            type(err).__name__,          # TypeError
-            __file__,                  # /tmp/example.py
-            err.__traceback__.tb_lineno  # 2
-        )
+
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -188,7 +182,6 @@ def create_booking(
         - **updated_at** (DATETIME): Datetime of booking updation.
 
     """
-    print("Calling get_booking method")
 
     query = select(BookingTable).where(and_(BookingTable.id == booking_id,
                                             BookingTable.is_deleted == False))
@@ -230,7 +223,6 @@ def get_all_bookings(
         - **updated_at** (DATETIME): Datetime of booking updation.
 
     """
-    print("Calling get_all_bookings method")
 
     if not current_user.is_authenticated:
         return redirect(url_for('AuthenticationRouter.login'))
@@ -295,7 +287,6 @@ def update_booking(
         - **updated_at** (DATETIME): Datetime of booking updation.
 
     """
-    print("Calling update_booking method")
 
     try:
         if request.method == "GET":
@@ -359,11 +350,6 @@ def update_booking(
                 "%Y-%m-%d %H:%M:%S")
             response["all_locations"] = all_locations
             response["all_travel_type"] = all_travel_type
-
-            print("form", form)
-            print("response", response)
-            print("all_travel_type", all_travel_type)
-            print("all_locations", all_locations)
 
             return render_template("index.html",
                                    form=form,
@@ -450,7 +436,6 @@ def update_booking(
             return redirect(url_for("dashboard.get_dashboard"))
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "booking already exists", "data": None},
@@ -464,16 +449,12 @@ def update_booking(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print(
-            type(err).__name__,          # TypeError
-            __file__,                  # /tmp/example.py
-            err.__traceback__.tb_lineno  # 2
-        )
+
         db_session.rollback()
         raise err
 
-        return ({"success": False, "message": "Internal server error", "data": None},
-                500, CONTENT_TYPE)
+    finally:
+        db_session.close()
 
 
 # Delete a single booking route
@@ -494,7 +475,6 @@ def delete_booking(
         - **message** (STR): booking deleted successfully.
 
     """
-    print("Calling delete_booking method")
 
     query = select(BookingTable).where(and_(BookingTable.id == booking_id,
                                             BookingTable.is_deleted == False))
@@ -542,7 +522,6 @@ def create_booking_by_locations(
         - **updated_at** (DATETIME): Datetime of booking updation.
 
     """
-    print("Calling create_booking_by_locations method")
 
     try:
         travel = {**request.json}
@@ -608,7 +587,6 @@ def create_booking_by_locations(
                  "data": booking.to_dict()}, 200, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Booking already exists", "data": None},
@@ -622,7 +600,6 @@ def create_booking_by_locations(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -646,30 +623,38 @@ def cancel_booking(
         - **message** (STR): booking cancelled successfully.
 
     """
-    print("Calling cancel_booking method")
 
-    query = select(BookingTable).where(and_(BookingTable.id == booking_id,
-                                            BookingTable.is_deleted == False))
+    try:
+        query = select(BookingTable).where(and_(BookingTable.id == booking_id,
+                                                BookingTable.is_deleted == False))
 
-    result = db_session.execute(query).scalar_one_or_none()
+        result = db_session.execute(query).scalar_one_or_none()
 
-    if result is None:
-        return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
-                404, CONTENT_TYPE)
+        if result is None:
+            return ({"success": False, "message": BOOKING_NOT_FOUND, "data": None},
+                    404, CONTENT_TYPE)
 
-    result.status = "cancelled"
+        result.status = "cancelled"
 
-    time_difference = (datetime.now() - result.created_at).days
+        time_difference = (datetime.now() - result.created_at).days
 
-    if time_difference > 60:
-        result.refund_amount = result.cost
-    elif time_difference > 30:
-        result.refund_amount = result.cost * 0.5
-    else:
-        result.refund_amount = 0.0
+        if time_difference > 60:
+            result.refund_amount = result.cost
+        elif time_difference > 30:
+            result.refund_amount = result.cost * 0.5
+        else:
+            result.refund_amount = 0.0
 
-    db_session.commit()
+        db_session.commit()
 
-    flash(message="Booking cancelled successfully", category="success")
+        flash(message="Booking cancelled successfully", category="success")
 
-    return redirect(url_for("dashboard.get_dashboard"))
+        return redirect(url_for("dashboard.get_dashboard"))
+    
+    except Exception as err:
+        db_session.rollback()
+        return ({"success": False, "message": "Something went wrong", "data": None},
+                500, CONTENT_TYPE)
+    
+    finally:
+        db_session.close()

@@ -54,7 +54,6 @@ def create_travel_type(
         - **created_at** (DATETIME): Datetime of travel type creation.
         - **updated_at** (DATETIME): Datetime of travel type updation.
     """
-    print("Calling create_travel_type method")
 
     try:
         record = TravelTypeTable(**request.json)
@@ -67,7 +66,6 @@ def create_travel_type(
                  "data": record.to_dict()}, 201, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Travel type already exists", "data": None},
@@ -81,7 +79,6 @@ def create_travel_type(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -109,7 +106,6 @@ def get_travel_type(
         - **updated_at** (DATETIME): Datetime of travel type updation.
 
     """
-    print("Calling get_travel_type method")
 
     query = select(TravelTypeTable).where(and_(TravelTypeTable.id == travel_type_id,
                                                TravelTypeTable.is_deleted == False))
@@ -148,7 +144,6 @@ def get_all_travel_categories(
         - **updated_at** (DATETIME): Datetime of travel type updation.
 
     """
-    print("Calling get_all_travel_categories method")
 
     query = select(func.count(TravelTypeTable.id)).where(
         TravelTypeTable.is_deleted == False)
@@ -200,7 +195,6 @@ def update_travel_type(
         - **updated_at** (DATETIME): Datetime of travel type updation.
 
     """
-    print("Calling update_travel_type method")
 
     try:
         query = select(TravelTypeTable).where(and_(TravelTypeTable.id == travel_type_id,
@@ -224,7 +218,6 @@ def update_travel_type(
                 200, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Travel type already exists", "data": None},
@@ -238,7 +231,6 @@ def update_travel_type(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
@@ -262,7 +254,6 @@ def delete_travel_type(
         - **message** (STR): travel type deleted successfully.
 
     """
-    print("Calling delete_travel_type method")
 
     query = select(TravelTypeTable).where(and_(TravelTypeTable.id == travel_type_id,
                                                TravelTypeTable.is_deleted == False))

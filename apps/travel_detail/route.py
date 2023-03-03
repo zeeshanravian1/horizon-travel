@@ -62,7 +62,6 @@ def create_travel_detail(
         - **created_at** (DATETIME): Datetime of travel detail creation.
         - **updated_at** (DATETIME): Datetime of travel detail updation.
     """
-    print("Calling create_travel_detail method")
 
     try:
         record = TravelDetailTable(**request.json)
@@ -75,7 +74,6 @@ def create_travel_detail(
                  "data": record.to_dict()}, 201, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Travel detail already exists", "data": None},
@@ -89,7 +87,6 @@ def create_travel_detail(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -121,7 +118,6 @@ def get_travel_detail(
         - **updated_at** (DATETIME): Datetime of travel detail updation.
 
     """
-    print("Calling get_travel_detail method")
 
     query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
                                                TravelDetailTable.is_deleted == False))
@@ -164,7 +160,6 @@ def get_all_travel_categories(
         - **updated_at** (DATETIME): Datetime of travel detail updation.
 
     """
-    print("Calling get_all_travel_categories method")
 
     query = select(func.count(TravelDetailTable.id)).where(
         TravelDetailTable.is_deleted == False)
@@ -224,7 +219,6 @@ def update_travel_detail(
         - **updated_at** (DATETIME): Datetime of travel detail updation.
 
     """
-    print("Calling update_travel_detail method")
 
     try:
         query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
@@ -252,7 +246,6 @@ def update_travel_detail(
                 200, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Travel detail already exists", "data": None},
@@ -266,7 +259,6 @@ def update_travel_detail(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
@@ -290,7 +282,6 @@ def delete_travel_detail(
         - **message** (STR): travel detail deleted successfully.
 
     """
-    print("Calling delete_travel_detail method")
 
     query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
                                                TravelDetailTable.is_deleted == False))

@@ -56,7 +56,6 @@ def create_max_seat(
         - **created_at** (DATETIME): Datetime of max seat creation.
         - **updated_at** (DATETIME): Datetime of max seat updation.
     """
-    print("Calling create_max_seat method")
 
     try:
         record = MaxSeatTable(**request.json)
@@ -69,7 +68,6 @@ def create_max_seat(
                  "data": record.to_dict()}, 201, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Max seat for given travel type already exists",
@@ -83,7 +81,6 @@ def create_max_seat(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -112,7 +109,6 @@ def get_max_seat(
         - **updated_at** (DATETIME): Datetime of max seat updation.
 
     """
-    print("Calling get_max_seat method")
 
     query = select(MaxSeatTable).where(and_(MaxSeatTable.travel_type_id == travel_type_id,
                                             MaxSeatTable.is_deleted == False))
@@ -152,7 +148,6 @@ def get_all_max_seats(
         - **updated_at** (DATETIME): Datetime of max seat updation.
 
     """
-    print("Calling get_all_max_seats method")
 
     query = select(func.count(MaxSeatTable.id)).where(
         MaxSeatTable.is_deleted == False)
@@ -205,7 +200,6 @@ def update_max_seat(
         - **updated_at** (DATETIME): Datetime of max seat updation.
 
     """
-    print("Calling update_max_seat method")
 
     try:
         query = select(MaxSeatTable).where(and_(MaxSeatTable.travel_type_id == travel_type_id,
@@ -229,7 +223,6 @@ def update_max_seat(
                 200, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Max seat already exists", "data": None},
@@ -243,7 +236,6 @@ def update_max_seat(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
@@ -267,7 +259,6 @@ def delete_max_seat(
         - **message** (STR): Max seat deleted successfully.
 
     """
-    print("Calling delete_max_seat method")
 
     query = select(MaxSeatTable).where(and_(MaxSeatTable.travel_type_id == travel_type_id,
                                                 MaxSeatTable.is_deleted == False))

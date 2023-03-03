@@ -62,7 +62,6 @@ def get_records(
         - **discounted_cost** (FLOAT): Discounted cost of travel.
 
     """
-    print("Calling get_records method")
 
     response = []
 
@@ -186,11 +185,6 @@ def get_records(
                                user=request.form.get("user"))
 
     except Exception as err:
-        print(
-            type(err).__name__,          # TypeError
-            __file__,                  # /tmp/example.py
-            err.__traceback__.tb_lineno  # 2
-        )
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})

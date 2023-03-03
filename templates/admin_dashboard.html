@@ -69,6 +69,9 @@
       <div class="col-sm-12 col-lg-12 mt-2 mb-2">
         <div class="m-0 row row-container bg-white p-3">
           <div class="col-md-2 col-lg-2 col-sm-3 ">
+            <h5>{{ booking.user_name | capitalize }}</h5>
+          </div>
+          <div class="col-md-2 col-lg-2 col-sm-3 ">
             <h5>{{ booking.class_type | capitalize }}</h5>
           </div>
           <div class="col-xl-3 col-md-3 col-sm-3 ">
@@ -80,14 +83,25 @@
             <h6>{{ booking.arrival_time }}</h6>
           </div>
           <div class="col-xl-3 col-md-4 col-sm-3  d-flex">
-            <span class="spn-price ">from</span>
+            <span class="spn-price ">cost</span>
             <div class="col-2">
 
               <h6>{{ booking.cost }}</h6>
               
             </div>
             <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
-            class="btn btn-sm admin-dwn-btn btn-primary">Download</a>   
+            class="btn btn-sm admin-dwn-btn btn-primary">Download</a>
+            {% if booking.status == 'cancelled' %}
+            <a href="" class="btn btn-sm btn-danger dwn-btn disabled">Cancelled</a>
+
+            {% else %}
+            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}"
+              class="btn btn-sm btn-info dwn-btn">Update</a>
+
+            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
+              class="btn btn-sm btn-danger dwn-btn">Cancel</a>
+
+            {% endif %} 
             
           </div>
         </div>

@@ -53,7 +53,6 @@ def register(db_session: Session = get_session()):
         - **None**
 
     """
-    print("Calling registration route")
 
     try:
         register_form = RegistrationForm()
@@ -93,23 +92,14 @@ def register(db_session: Session = get_session()):
 
     except (IntegrityError, PendingRollbackError, InvalidRequestError,
             StatementError, ResourceClosedError) as err:
-        print(
-            type(err).__name__,          # TypeError
-            __file__,                  # /tmp/example.py
-            err.__traceback__.tb_lineno  # 2
-        )  
         db_session.rollback()
         flash("Username or email already exists.")
         return render_template("register.html", form=register_form)
 
     except Exception as err:
-        print(
-            type(err).__name__,          # TypeError
-            __file__,                  # /tmp/example.py
-            err.__traceback__.tb_lineno  # 2
-        )   
-
-
+        db_session.rollback()
+        flash("Something went wrong.")
+        return render_template("register.html", form=register_form)
 
 # Login Route
 @auth_router.route("/login", methods=["GET", "POST"])
@@ -127,7 +117,6 @@ def login(db_session: Session = get_session()):
         - **None**
 
     """
-    print("Calling login route")
 
     if current_user.is_authenticated:
         return redirect(url_for("root"))
@@ -141,13 +130,9 @@ def login(db_session: Session = get_session()):
         flash("Invalid credentials.", "error")
         return render_template("login.html", form=login_form)
 
-    print(login_form.email.data, login_form.password.data)
     # Getting user data
     query = select(UserTable).where(UserTable.email == login_form.email.data)
-    print(query)
     user_data = db_session.execute(query).scalar_one_or_none()
-
-    print(user_data)
 
     if not user_data:
         flash('User not found!', 'error')
@@ -186,7 +171,6 @@ def logout():
         - **None**
 
     """
-    print("Calling logout route")
 
     logout_user()
     flash("Logged out successfully.", "success")

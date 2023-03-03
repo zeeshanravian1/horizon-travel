@@ -29,7 +29,7 @@ homepage_router = Blueprint(
 # --------------------------------------------------------------------------------------------------
 
 
-# Create a single location
+# Get homepage route
 @homepage_router.route("/", methods=["GET", "POST"])
 def get_homepage(
     db_session: Session = get_session()
@@ -50,7 +50,6 @@ def get_homepage(
         - **travel_types** (LIST): List of travel types.
 
     """
-    print("Calling get_homepage method")
 
     response = {}
 
@@ -77,7 +76,6 @@ def get_homepage(
         users = db_session.execute(query).scalars().all()
 
         return render_template("index.html",
-                
                 departure_locations=response["departure_locations"],
                 arrival_locations=response["arrival_locations"],
                 travel_types=response["travel_types"],
@@ -86,7 +84,6 @@ def get_homepage(
             )
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})

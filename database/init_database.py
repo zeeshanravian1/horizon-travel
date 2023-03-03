@@ -69,7 +69,6 @@ def insert_data(session=get_session()):
         - **None**
 
     """
-    print("Calling insert_data method")
 
     try:
         # Insert Admin

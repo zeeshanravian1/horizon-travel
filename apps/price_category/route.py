@@ -54,7 +54,6 @@ def create_price_category(
         - **created_at** (DATETIME): Datetime of price category creation.
         - **updated_at** (DATETIME): Datetime of price category updation.
     """
-    print("Calling create_price_category method")
 
     try:
         record = PriceCategoryTable(**request.json)
@@ -67,7 +66,6 @@ def create_price_category(
                  "data": record.to_dict()}, 201, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Price category already exists", "data": None},
@@ -81,7 +79,6 @@ def create_price_category(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, CONTENT_TYPE)
@@ -109,7 +106,6 @@ def get_price_category(
         - **updated_at** (DATETIME): Datetime of price category updation.
 
     """
-    print("Calling get_price_category method")
 
     query = select(PriceCategoryTable).where(and_(PriceCategoryTable.id == price_category_id,
                                              PriceCategoryTable.is_deleted == False))
@@ -148,7 +144,6 @@ def get_all_price_categories(
         - **updated_at** (DATETIME): Datetime of price category updation.
 
     """
-    print("Calling get_all_price_categories method")
 
     query = select(func.count(PriceCategoryTable.id)).where(
         PriceCategoryTable.is_deleted == False)
@@ -200,7 +195,6 @@ def update_price_category(
         - **updated_at** (DATETIME): Datetime of price category updation.
 
     """
-    print("Calling update_price_category method")
 
     try:
         query = select(PriceCategoryTable).where(and_(PriceCategoryTable.id == price_category_id,
@@ -224,7 +218,6 @@ def update_price_category(
                 200, CONTENT_TYPE)
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "Price category already exists", "data": None},
@@ -238,7 +231,6 @@ def update_price_category(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
@@ -262,7 +254,6 @@ def delete_price_category(
         - **message** (STR): price category deleted successfully.
 
     """
-    print("Calling delete_price_category method")
 
     query = select(PriceCategoryTable).where(and_(PriceCategoryTable.id == price_category_id,
                                              PriceCategoryTable.is_deleted == False))

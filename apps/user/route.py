@@ -63,7 +63,6 @@ def get_user(
         - **updated_at** (DATETIME): Datetime of user updation.
 
     """
-    print("Calling get_user method")
 
     form = UpdateProfileForm()
 
@@ -115,7 +114,6 @@ def get_all_users(
         - **updated_at** (DATETIME): Datetime of user updation.
 
     """
-    print("Calling get_all_users method")
 
     query = select(func.count(UserTable.id)).where(UserTable.is_deleted == False)
     result = db_session.execute(query)
@@ -176,7 +174,6 @@ def update_user(
         - **updated_at** (DATETIME): Datetime of user updation.
 
     """
-    print("Calling update_user method")
 
     try:
 
@@ -205,7 +202,6 @@ def update_user(
         return redirect(url_for("HomePage.get_homepage"))
 
     except IntegrityError as err:
-        print("integrity error", err)
         db_session.rollback()
         if err.orig.args[0] == 1062:
             return ({"success": False, "message": "user already exists", "data": None},
@@ -219,10 +215,12 @@ def update_user(
                 400, CONTENT_TYPE)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
+    
+    finally:
+        db_session.close()
 
 
 # Delete a single user route
@@ -243,7 +241,6 @@ def delete_user(
         - **message** (STR): User deleted successfully.
 
     """
-    print("Calling delete_user method")
 
     query = select(UserTable).where(and_(UserTable.id == user_id,
                                          UserTable.is_deleted == False))

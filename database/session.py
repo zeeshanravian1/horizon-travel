@@ -35,7 +35,6 @@ def get_session():
         - **session** (AsyncSession): Session.
 
     """
-    print("Calling get_session method")
 
     session: Session = SessionLocal()
 

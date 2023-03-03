@@ -134,7 +134,6 @@ def generate_report(
 
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": None},
                 500, {"ContentType": "application/json"})

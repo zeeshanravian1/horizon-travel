@@ -62,7 +62,6 @@ def get_dashboard(
         - **booking_id** (STRING): Booking id.
 
     """
-    print("Calling get_dashboard method")
 
     response = []
 
@@ -128,11 +127,9 @@ def get_dashboard(
                 "status": booking_detail.status
             })
 
-        print("response", response)
         return render_template('bookings_list.html', bookings=response, my_bookings=True)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})
@@ -170,7 +167,6 @@ def get_dashboard_admin(
         - **user_name** (STRING): User name.
 
     """
-    print("Calling get_dashboard_admin method")
 
     response = {
         "bookings": [],
@@ -179,9 +175,6 @@ def get_dashboard_admin(
         "top_customers": []
     }
 
-    print("current_user", current_user)
-    print("current_user.is_authenticated", current_user.is_authenticated)
-    print("current_user.is_admin", current_user.is_admin)
 
     if current_user.is_authenticated and current_user.is_admin:
         user_id = current_user.id
@@ -292,7 +285,6 @@ def get_dashboard_admin(
         return render_template("admin_dashboard.html", data=response)
 
     except Exception as err:
-        print("error", err)
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})
