@@ -118,40 +118,48 @@ def login(db_session: Session = get_session()):
 
     """
 
-    if current_user.is_authenticated:
-        return redirect(url_for("root"))
+    try:
+        if current_user.is_authenticated:
+            return redirect(url_for("root"))
 
-    login_form = LoginForm()
+        login_form = LoginForm()
 
-    if request.method == "GET":
-        return render_template("login.html", form=login_form)
+        if request.method == "GET":
+            return render_template("login.html", form=login_form)
 
-    if not login_form.validate_on_submit():
-        flash("Invalid credentials.", "error")
-        return render_template("login.html", form=login_form)
+        if not login_form.validate_on_submit():
+            flash("Invalid credentials.", "error")
+            return render_template("login.html", form=login_form)
 
-    # Getting user data
-    query = select(UserTable).where(UserTable.email == login_form.email.data)
-    user_data = db_session.execute(query).scalar_one_or_none()
+        # Getting user data
+        query = select(UserTable).where(UserTable.email == login_form.email.data)
+        user_data = db_session.execute(query).scalar_one_or_none()
 
-    if not user_data:
-        flash('User not found!', 'error')
-        return render_template("login.html", form=login_form)
+        if not user_data:
+            flash('User not found!', 'error')
+            return render_template("login.html", form=login_form)
 
-    if not pbkdf2_sha256.verify(login_form.password.data, user_data.password):
-        flash(PASSWORD_INCORRECT, 'error')
+        if not pbkdf2_sha256.verify(login_form.password.data, user_data.password):
+            flash(PASSWORD_INCORRECT, 'error')
+            return render_template("login.html", form=login_form)
+        
+        booking_id = request.args.get("booking_id", None)
+
+        if booking_id:
+            booking = db_session.query(BookingTable).filter_by(id=booking_id).first()
+            booking.user_id = user_data.id
+            db_session.commit()
+
+        flash("Logged in successfully.", 'success')
+        login_user(user_data, remember=login_form.remember.data)
+        return redirect(url_for("HomePage.get_homepage"))
+    
+    except Exception as err:
+        flash("Something went wrong.")
         return render_template("login.html", form=login_form)
     
-    booking_id = request.args.get("booking_id", None)
-
-    if booking_id:
-        booking = db_session.query(BookingTable).filter_by(id=booking_id).first()
-        booking.user_id = user_data.id
-        db_session.commit()
-
-    flash("Logged in successfully.", 'success')
-    login_user(user_data, remember=login_form.remember.data)
-    return redirect(url_for("HomePage.get_homepage"))
+    finally:
+        db_session.close()
 
 
 # Logout Route
