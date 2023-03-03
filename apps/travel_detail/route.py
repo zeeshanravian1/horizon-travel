@@ -19,6 +19,9 @@ from flask import (Blueprint, request)
 from database.session import (get_session)
 from .exception import (TRAVEL_DETAIL_NOT_FOUND)
 from .model import (TravelDetailTable)
+from apps.location.model import (LocationTable)
+from apps.travel_type.model import (TravelTypeTable)
+from apps.expense.model import (ExpenseTable)
 from ..base import (CONTENT_TYPE)
 
 
@@ -135,7 +138,6 @@ def get_travel_detail(
 # Get all travel details route
 @travel_detail_router.get("/")
 def get_all_travel_categories(
-    page: int | None = None, limit: int | None = None,
     db_session: Session = get_session()
 ):
     """
@@ -161,6 +163,8 @@ def get_all_travel_categories(
 
     """
 
+    response = []
+
     query = select(func.count(TravelDetailTable.id)).where(
         TravelDetailTable.is_deleted == False)
     result = db_session.execute(query)
@@ -168,24 +172,42 @@ def get_all_travel_categories(
 
     query = select(TravelDetailTable).where(TravelDetailTable.is_deleted == False)
 
-    if page and limit:
-        query = select(TravelDetailTable).where(and_(
-            TravelDetailTable.is_deleted == False, TravelDetailTable.id > (page - 1) * limit)).limit(limit)
+    travel_details = db_session.execute(query).scalars().all()
 
-    result = db_session.execute(query).scalars().all()
+    for travel_detail in travel_details:
+        travel_detail = travel_detail.to_dict()
+        travel_type = db_session.query(TravelTypeTable).filter(
+            TravelTypeTable.id == travel_detail["travel_type_id"]).first()
+        
+        travel_detail["travel_type"] = travel_type.name
 
-    if not result:
-        return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
-                404, CONTENT_TYPE)
-    
-    if not (page and limit):
-        page = 1
-        limit = total_count
+        departure_location = db_session.query(LocationTable).filter(
+            LocationTable.id == travel_detail["departure_location_id"]).first()
+        
+        travel_detail["departure_location"] = departure_location.name
+
+        arrival_location = db_session.query(LocationTable).filter(
+            LocationTable.id == travel_detail["arrival_location_id"]).first()
+        
+        travel_detail["arrival_location"] = arrival_location.name
+
+        expense = db_session.query(ExpenseTable).filter(
+            ExpenseTable.travel_detail_id == travel_detail["id"]).first()
+        
+        travel_detail["expense"] = expense.cost
+
+        del travel_detail["travel_type_id"]
+        del travel_detail["departure_location_id"]
+        del travel_detail["arrival_location_id"]
+        del travel_detail["is_deleted"]
+        del travel_detail["created_at"]
+        del travel_detail["updated_at"]
+
+        response.append(travel_detail)
 
     return ({"success": True, "message": "Travel details fetched successfully",
-             "data": {"total": total_count, "page": page, "limit": limit,
-                      "items": [travel_detail.to_dict() for travel_detail in result]}},
-            200, CONTENT_TYPE)
+                "data": response,
+                "total_count": total_count}, 200, CONTENT_TYPE)
 
 
 # Update a single travel detail route
