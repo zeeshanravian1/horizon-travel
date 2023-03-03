@@ -97,9 +97,13 @@
             {% else %}
             <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}"
               class="btn btn-sm btn-info dwn-btn">Update</a>
-
-            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
+            
+              {% if booking.status == 'cancelled' %}
+              <a href="#" class="btn btn-sm btn-danger dwn-btn disabled">Cancelled</a>
+              {% else %}
+              <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
               class="btn btn-sm btn-danger dwn-btn">Cancel</a>
+              {% endif %} 
 
             {% endif %} 
             

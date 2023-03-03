@@ -649,6 +649,11 @@ def cancel_booking(
 
         flash(message="Booking cancelled successfully", category="success")
 
+        db_session.close()
+
+        if current_user.is_admin:
+            return redirect(url_for("dashboard.get_dashboard_admin"))
+
         return redirect(url_for("dashboard.get_dashboard"))
     
     except Exception as err:

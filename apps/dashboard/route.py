@@ -241,7 +241,8 @@ def get_dashboard_admin(
                         "cost": booking_detail.cost,
                         "booking_id": booking_detail.id,
                         "user_id": user.id,
-                        "user_name": user.name
+                        "user_name": user.name,
+                        "status": booking_detail.status
                     })
 
                     if booking_detail.created_at.strftime("%B %Y") in response["monthly_revenue"]:
@@ -288,3 +289,6 @@ def get_dashboard_admin(
         db_session.rollback()
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})
+    
+    finally:
+        db_session.close()
