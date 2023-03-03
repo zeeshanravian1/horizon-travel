@@ -8,12 +8,12 @@
 """
 
 # Importing Python packages
-from sqlalchemy import (select, func, and_)
+from sqlalchemy import (select, update, func, and_)
 from sqlalchemy.orm import (Session)
 from sqlalchemy.exc import (IntegrityError)
 
 # Importing Flask packages
-from flask import (Blueprint, request)
+from flask import (Blueprint, request, flash, render_template, redirect, url_for)
 
 # Importing from project files
 from database.session import (get_session)
@@ -23,6 +23,7 @@ from apps.location.model import (LocationTable)
 from apps.travel_type.model import (TravelTypeTable)
 from apps.expense.model import (ExpenseTable)
 from ..base import (CONTENT_TYPE)
+from .form import (TravelDetailForm)
 
 
 travel_detail_router = Blueprint(
@@ -95,44 +96,44 @@ def create_travel_detail(
                 500, CONTENT_TYPE)
 
 
-# Get a single travel detail route
-@travel_detail_router.get("/<int:travel_detail_id>/")
-def get_travel_detail(
-    travel_detail_id: int, db_session: Session = get_session()
-):
-    """
-        Get a single travel detail.
+# # Get a single travel detail route
+# @travel_detail_router.get("/<int:travel_detail_id>/")
+# def get_travel_detail(
+#     travel_detail_id: int, db_session: Session = get_session()
+# ):
+#     """
+#         Get a single travel detail.
 
-        Description:
-        - This method is used to get a single travel detail.
+#         Description:
+#         - This method is used to get a single travel detail.
 
-        Parameters:
-        - **travel_detail_id** (INT): Id of travel detail. *--Required*
+#         Parameters:
+#         - **travel_detail_id** (INT): Id of travel detail. *--Required*
 
-        Returns:
-        travel detail details along with following information:
-        - **id** (INT): Id of travel detail.
-        - **travel_type_id** (INT): Id of travel type.
-        - **departure_location_id** (INT): Id of departure location.
-        - **departure_time** (DATETIME): Datetime of departure.
-        - **arrival_location_id** (INT): Id of arrival location.
-        - **arrival_time** (DATETIME): Datetime of arrival.
-        - **created_at** (DATETIME): Datetime of travel detail creation.
-        - **updated_at** (DATETIME): Datetime of travel detail updation.
+#         Returns:
+#         travel detail details along with following information:
+#         - **id** (INT): Id of travel detail.
+#         - **travel_type_id** (INT): Id of travel type.
+#         - **departure_location_id** (INT): Id of departure location.
+#         - **departure_time** (DATETIME): Datetime of departure.
+#         - **arrival_location_id** (INT): Id of arrival location.
+#         - **arrival_time** (DATETIME): Datetime of arrival.
+#         - **created_at** (DATETIME): Datetime of travel detail creation.
+#         - **updated_at** (DATETIME): Datetime of travel detail updation.
 
-    """
+#     """
 
-    query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
-                                               TravelDetailTable.is_deleted == False))
+#     query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
+#                                                TravelDetailTable.is_deleted == False))
 
-    record = db_session.execute(statement=query).scalar_one_or_none()
+#     record = db_session.execute(statement=query).scalar_one_or_none()
 
-    if record is None:
-        return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
-                404, CONTENT_TYPE)
+#     if record is None:
+#         return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
+#                 404, CONTENT_TYPE)
 
-    return ({"success": True, "message": "Travel detail fetched successfully", "data": record.to_dict()},
-            200, CONTENT_TYPE)
+#     return ({"success": True, "message": "Travel detail fetched successfully", "data": record.to_dict()},
+#             200, CONTENT_TYPE)
 
 
 # Get all travel details route
@@ -211,7 +212,7 @@ def get_all_travel_categories(
 
 
 # Update a single travel detail route
-@travel_detail_router.put("/<int:travel_detail_id>/")
+@travel_detail_router.route("/<int:travel_detail_id>/", methods=["GET", "POST"])
 def update_travel_detail(
     travel_detail_id: int, db_session: Session = get_session()
 ):
@@ -243,30 +244,49 @@ def update_travel_detail(
     """
 
     try:
-        query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
-                                                   TravelDetailTable.is_deleted == False))
+        if request.method == "GET":
+            response = {}
+            form = TravelDetailForm(request.form)
 
-        result = db_session.execute(query).scalar_one_or_none()
+            query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
+                                                            TravelDetailTable.is_deleted == False))
+            
+            travel_detail = db_session.execute(query).scalar_one_or_none()
 
-        if result is None:
-            return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
-                    404, CONTENT_TYPE)
+            if travel_detail is None:
+                flash(TRAVEL_DETAIL_NOT_FOUND, "error")
+                return redirect(url_for("travel_detail.update_travel_detail", travel_detail_id=travel_detail_id))
+            
+            query = select(TravelTypeTable).where(TravelTypeTable.id == travel_detail.travel_type_id)
+            travel_type = db_session.execute(statement=query).scalar_one_or_none()
 
-        if result.name == request.json["name"]:
-            return ({"success": False, "message": "Travel detail already exists", "data": None},
-                    409, CONTENT_TYPE)
+            query = select(LocationTable).where(LocationTable.id == travel_detail.departure_location_id)
+            departure_location = db_session.execute(statement=query).scalar_one_or_none()
 
-        result.travel_type_id = request.json["travel_type_id"]
-        result.departure_location_id = request.json["departure_location_id"]
-        result.departure_time = request.json["departure_time"]
-        result.arrival_location_id = request.json["arrival_location_id"]
-        result.arrival_time = request.json["arrival_time"]
+            query = select(LocationTable).where(LocationTable.id == travel_detail.arrival_location_id)
+            arrival_location = db_session.execute(statement=query).scalar_one_or_none()
 
-        db_session.commit()
+            expense = db_session.query(ExpenseTable).filter(
+            ExpenseTable.travel_detail_id == travel_detail.id).first()
 
-        return ({"success": True, "message": "Travel detail updated successfully", "data": result.to_dict()},
-                200, CONTENT_TYPE)
+            form.departure_location.data = departure_location.name
+            form.arrival_location.data = arrival_location.name
+            form.travel_type.data = travel_type.name
+            form.departure_time.data = travel_detail.departure_time
+            form.arrival_time.data = travel_detail.arrival_time
+            form.expense.data = expense.cost
 
+            response["id"] = travel_detail.id
+            response["departure_location"] = departure_location.name
+            response["arrival_location"] = arrival_location.name
+            response["travel_type"] = travel_type.name
+            response["departure_time"] = travel_detail.departure_time
+            response["arrival_time"] = travel_detail.arrival_time
+            response["expense"] = expense.cost
+            
+            return ({"success": True, "message": "Travel detail fetched successfully",
+                     "data": response}, 200, CONTENT_TYPE)
+        
     except IntegrityError as err:
         db_session.rollback()
         if err.orig.args[0] == 1062:
@@ -281,6 +301,11 @@ def update_travel_detail(
                 400, CONTENT_TYPE)
 
     except Exception as err:
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )
         db_session.rollback()
         return ({"success": False, "message": "Internal server error", "data": None},
                 500, CONTENT_TYPE)
