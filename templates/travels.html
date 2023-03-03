@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="container">
-  <div class="row le-hide">
+  <div class="row  ">
     <h1 class="mt-4">Travels</h1>
 
     <div class="col-lg-12">
       <div class="col-md-3 col-lg-2 p-0">
-        <a href="{{ url_for('TravelDetailRouter.create_travel_detail') }}" class="btn btn-primary mt-4">Create New Travel</a>
+        <a href="{{ url_for('TravelDetailRouter.create_travel_detail') }}" class="btn  btn-primary mt-4">Create New Travel</a>
       </div>
 
 
@@ -47,7 +47,7 @@
             </div>
             <div class="travel-btn d-flex">
               <div class="btn1">
-                <a href="{{ url_for('TravelDetailRouter.update_travel_detail', travel_detail_id=travel.id) }}" class="btn btn-sm upd-btn btn-primary">Update</a>
+                <a href="{{ url_for('TravelDetailRouter.update_travel_detail', travel_detail_id=travel.id) }}" class="btn btn-sm upd-btn btn-info">Update</a>
               </div>
               <div class="btn1">
                 <a href="{{ url_for('TravelDetailRouter.delete_travel_detail', travel_detail_id=travel.id) }}" class="btn btn-sm del-btn btn-danger">Delete</a>
