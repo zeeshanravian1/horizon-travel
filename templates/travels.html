@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="row le-hide">
+    <h1 class="mt-4">Travels</h1>
+
+    <div class="col-lg-12">
+      <div class="col-md-3 col-lg-2 p-0">
+        <button class="btn btn-primary mt-4">New Travels</button>
+      </div>
+
+
+
+    </div>
+
+
+  </div>
+
+
+  {% for travel in travel_detail %}
+  <div class="row">
+    <div class="col-sm-12 col-lg-12 mt-2">
+      <div class="col-sm-12 col-lg-12 mt-2 mb-2">
+        <div class="m-0 row row-container bg-white p-3">
+          <div class="col-md-3 col-lg-2  p-0 pl-lg-2">
+            <h5>{{ travel.travel_type | capitalize }}</h5>
+          </div>
+          <div class="col-md-3 col-lg-2  p-0 pl-lg-2">
+            <h5>{{ travel.class_type | capitalize }} Class</h5>
+          </div>
+          <div class="col-sm-3 col-md-3 col-lg-3  p-0 p-0 pl-lg-5">
+            <h5 class="">{{ travel.departure_location | capitalize }}</h5>
+            <h6>{{ travel.departure_time }}</h6>
+          </div>
+          <div class="col-sm-3 col-md-3 col-lg-3 p-0 p-0 pl-lg-5">
+            <h5>{{ travel.arrival_location | capitalize }}</h5>
+            <h6>{{ travel.arrival_time }}</h6>
+          </div>
+          <div class="col-sm-3 col-md-3 col-lg-3 p-0 p-0 pl-lg-5 d-flex">
+            <span class="spn-price ">from</span>
+            <div class="">
+
+              <h6>US$ {{ travel.expense }}</h6>
+
+              <span class="spn-price">Oneway-trip</span>
+            </div>
+            <div class="travel-btn d-flex">
+              <div class="btn1">
+                <a href="{{ url_for('TravelDetailRouter.update_travel_detail', travel_detail_id=travel.id) }}" class="btn btn-sm upd-btn btn-primary">Update</a>
+              </div>
+              <div class="btn1">
+                <a href="{{ url_for('TravelDetailRouter.delete_travel_detail', travel_detail_id=travel.id) }}" class="btn btn-sm del-btn btn-danger">Delete</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

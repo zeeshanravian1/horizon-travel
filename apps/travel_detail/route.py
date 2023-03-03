@@ -23,6 +23,7 @@ from .model import (TravelDetailTable)
 from apps.location.model import (LocationTable)
 from apps.travel_type.model import (TravelTypeTable)
 from apps.expense.model import (ExpenseTable)
+from apps.price_category.model import (PriceCategoryTable)
 from ..base import (CONTENT_TYPE)
 from .form import (TravelDetailForm)
 
@@ -38,7 +39,7 @@ travel_detail_router = Blueprint(
 
 
 # Create a single travel detail
-@travel_detail_router.post("/")
+@travel_detail_router.route("/create/", methods=["GET", "POST"])
 def create_travel_detail(
     db_session: Session = get_session()
 ):
@@ -175,7 +176,7 @@ def create_travel_detail(
 
 
 # Get all travel details route
-@travel_detail_router.get("/")
+@travel_detail_router.route("/all/", methods=["GET"])
 def get_all_travel_categories(
     db_session: Session = get_session()
 ):
@@ -199,7 +200,6 @@ def get_all_travel_categories(
         - **arrival_time** (DATETIME): Datetime of arrival.
         - **created_at** (DATETIME): Datetime of travel detail creation.
         - **updated_at** (DATETIME): Datetime of travel detail updation.
-
     """
 
     response = []
@@ -230,30 +230,37 @@ def get_all_travel_categories(
         
         travel_detail["arrival_location"] = arrival_location.name
 
+        travel_detail["arrival_location"] = arrival_location.name
+
         expense = db_session.query(ExpenseTable).filter(
-            ExpenseTable.travel_detail_id == travel_detail["id"]).first()
-        
-        travel_detail["expense"] = expense.cost
+            ExpenseTable.travel_detail_id == travel_detail["id"]).all()
 
-        del travel_detail["travel_type_id"]
-        del travel_detail["departure_location_id"]
-        del travel_detail["arrival_location_id"]
-        del travel_detail["is_deleted"]
-        del travel_detail["created_at"]
-        del travel_detail["updated_at"]
+        for expense in expense:
+            data = travel_detail.copy()
+            query = select(PriceCategoryTable).where(
+                PriceCategoryTable.id == expense.price_category_id)
+            price_category = db_session.execute(query).scalar_one_or_none()
 
-        response.append(travel_detail)
+            data["class_type"] = price_category.name
 
-    return ({"success": True, "message": "Travel details fetched successfully",
-                "data": response,
-                "total_count": total_count}, 200, CONTENT_TYPE)
+            data["expense"] = expense.cost
 
+            del data["travel_type_id"]
+            del data["departure_location_id"]
+            del data["arrival_location_id"]
+            del data["is_deleted"]
+            del data["created_at"]
+            del data["updated_at"]
+
+            response.append(data)
+
+    return render_template("travels.html", travel_detail=response)
 
 # Update a single travel detail route
-@travel_detail_router.route("/<int:travel_detail_id>/", methods=["GET", "POST"])
+@travel_detail_router.route("/update/<int:travel_detail_id>/", methods=["GET", "POST"])
 @login_required
 def update_travel_detail(
-    travel_detail_id: int, db_session: Session = get_session()
+    travel_detail_id: int = 0, db_session: Session = get_session()
 ):
     """
         Update a single travel detail.
@@ -298,7 +305,7 @@ def update_travel_detail(
 
             if travel_detail is None:
                 flash(TRAVEL_DETAIL_NOT_FOUND, "error")
-                return redirect(url_for("travel_detail.update_travel_detail", travel_detail_id=travel_detail_id))
+                return redirect(url_for("travel_detail.get_all_travel_categories", travel_detail_id=travel_detail_id))
             
             query = select(TravelTypeTable).where(TravelTypeTable.id == travel_detail.travel_type_id)
             travel_type = db_session.execute(statement=query).scalar_one_or_none()
@@ -326,13 +333,35 @@ def update_travel_detail(
             response["departure_time"] = travel_detail.departure_time
             response["arrival_time"] = travel_detail.arrival_time
             response["expense"] = expense.cost
+
+            # get all locations
+            query = select(LocationTable).where(LocationTable.is_deleted == False)
+
+            locations = db_session.execute(statement=query).scalars().all()
+            locations = [{"id": location.id, "name": location.name} for location in locations]
+
+            response["locations"] = locations
+
+            # get all travel types
+            query = select(TravelTypeTable).where(TravelTypeTable.is_deleted == False)
+
+            travel_types = db_session.execute(statement=query).scalars().all()
+            travel_types = [{"id": travel_type.id, "name": travel_type.name} for travel_type in travel_types]
+
+            response["travel_types"] = travel_types
             
-            return ({"success": True, "message": "Travel detail fetched successfully",
-                     "data": response}, 200, CONTENT_TYPE)
+            return render_template("newtravels.html", form=form, response=response, travel_detail_id=travel_detail_id)
         
         if request.method == "POST":
-            form = TravelDetailForm(request.form)
-            
+            # form = TravelDetailForm(request.form)
+            print(
+                request.form.get("departure_location"),
+                request.form.get("arrival_location"),
+                request.form.get("travel_type"),
+                request.form.get("departure_time"),
+                request.form.get("arrival_time"),
+                request.form.get("expense")
+            )
             # get location ids
             query = select(LocationTable). \
                 where(and_(LocationTable.name.in_(
@@ -398,7 +427,7 @@ def update_travel_detail(
 
 
 # Delete a single travel detail route
-@travel_detail_router.delete("/<int:travel_detail_id>/")
+@travel_detail_router.route("/delete/<int:travel_detail_id>/")
 def delete_travel_detail(
     travel_detail_id: int, db_session: Session = get_session()
 ):
@@ -415,19 +444,31 @@ def delete_travel_detail(
         - **message** (STR): travel detail deleted successfully.
 
     """
+    try:
+        query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
+                                                TravelDetailTable.is_deleted == False))
 
-    query = select(TravelDetailTable).where(and_(TravelDetailTable.id == travel_detail_id,
-                                               TravelDetailTable.is_deleted == False))
+        result = db_session.execute(query).scalar_one_or_none()
 
-    result = db_session.execute(query).scalar_one_or_none()
+        if result is None:
+            return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
+                    404, CONTENT_TYPE)
 
-    if result is None:
-        return ({"success": False, "message": TRAVEL_DETAIL_NOT_FOUND, "data": None},
-                404, CONTENT_TYPE)
+        result.is_deleted = True
 
-    result.is_deleted = True
+        db_session.commit()
 
-    db_session.commit()
-
-    return ({"success": True, "message": "Travel detail deleted successfully"},
-            200, CONTENT_TYPE)
+        flash(message="Travel detail deleted successfully", category="success")
+        return redirect(url_for("TravelDetailRouter.get_all_travel_categories"))
+    
+    except Exception as err:
+        print(
+            type(err).__name__,          # TypeError
+            __file__,                  # /tmp/example.py
+            err.__traceback__.tb_lineno  # 2
+        )
+        db_session.rollback()
+        return redirect(url_for("TravelDetailRouter.get_all_travel_categories"))
+    
+    finally:
+        db_session.close()

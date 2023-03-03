@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="{{ url_for('TravelDetailRouter.update_travel_detail', travel_detail_id=travel_detail_id) }}" method="POST">
+<div class="container di mt-5">
+  <div class="row">
+      <div class="col-12">
+          <div class="">
+              <div class="radio-btn">
+                  {% for travel_type in response.travel_types %}
+                    <div class="form-check">
+                    {% if travel_type.name == response.travel_type %}
+                      
+                      <input class="form-check-input" value="{{ travel_type.id }}" type="radio" name="travel_type" id="flexRadioDefault{{ loop.index }}" checked>
+                    {% else %}
+                      <input class="form-check-input" value="{{ travel_type.id }}" type="radio" name="travel_type" id="flexRadioDefault{{ loop.index }}">
+                      
+                    {% endif %}
+                        <label class="form-check-label" for="flexRadioDefault{{ loop.index }}">
+                        {{ travel_type.name | capitalize }}
+                        </label>
+                      </div>   
+                  {% endfor %}
+              </div>   
+              <div class="">
+                <div class=" ">
+                  <label class="label1" for="From">From</label>
+                 <select id="from" class="inp1" name="departure_location">
+                    {% for location in response.locations %}
+                      {% if location.name == response.departure_location %}
+                      <option value="{{ location.id }}" selected>{{ location.name | capitalize }}</option>
+                        
+                      {% else %}
+                      <option value="{{ location.id }}">{{ location.name | capitalize }}</option>
+                        
+                      {% endif %}
+                    {% endfor %}
+                 </select>
+                 
+                 <input type="datetime-local" name="departure_time" class="inp1" value="{{ response.departure_time }}">
+                 
+
+                 
+             </div>
+             <div class="" style="margin-left: 12px;">
+               <label class="label1" for="From">To</label>
+              <select id="from" class="inp1" name="arrival_location">
+                {% for location in response.locations %}
+                  {% if location.name == response.arrival_location %}
+                  <option value="{{ location.id }}" selected>{{ location.name | capitalize }}</option>
+                    
+                  {% else %}
+                  <option value="{{ location.id }}">{{ location.name | capitalize }}</option>
+                    
+                  {% endif %}
+                {% endfor %}
+              </select>
+              
+              <input type="datetime-local" name="arrival_time" class="inp1" value="{{ response.arrival_time }}">
+
+              
+
+              
+          </div>
+          <div class="">
+             <label class="label1" for="">Price</label>
+             <input type="number" name="expense" class="inp1" value="{{ response.expense }}">
+
+             <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+         </div>
+              </div>
+      </div>
+  </div>
+</div>
+</form>
+{% endblock %}
