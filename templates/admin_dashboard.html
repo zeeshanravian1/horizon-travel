@@ -84,21 +84,11 @@
             <div class="col-2">
 
               <h6>{{ booking.cost }}</h6>
-
+              
             </div>
             <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
-              class="btn btn-sm dwn-btn btn-primary">Download</a>
-            {% if booking.status == 'cancelled' %}
-            <a href="" class="btn btn-sm btn-danger dwn-btn disabled">Cancelled</a>
-
-            {% else %}
-            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}"
-              class="btn btn-sm btn-info dwn-btn">Update</a>
-
-            <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
-              class="btn btn-sm btn-danger dwn-btn">Cancel</a>
-
-            {% endif %}
+            class="btn btn-sm admin-dwn-btn btn-primary">Download</a>   
+            
           </div>
         </div>
         {% endfor %}
