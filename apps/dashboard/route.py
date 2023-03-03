@@ -137,6 +137,9 @@ def get_dashboard(
         return ({"success": False, "message": "Something went wrong", "data": response},
                 500, {"ContentType": "application/json"})
 
+    finally:
+        db_session.close()
+
 
 # get dashboard data for admin
 @dashboard_router.get("/admin/")
