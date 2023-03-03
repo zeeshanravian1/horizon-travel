@@ -360,7 +360,6 @@ def update_booking(
             response["all_locations"] = all_locations
             response["all_travel_type"] = all_travel_type
 
-
             print("form", form)
             print("response", response)
             print("all_travel_type", all_travel_type)
@@ -375,24 +374,17 @@ def update_booking(
                                        location.name for location in all_locations],
                                    arrival_locations=[
                                        location.name for location in all_locations],
-                                    update_booking=True,
-                                    booking_id=booking_id
+                                   update_booking=True,
+                                   booking_id=booking_id
                                    )
 
         if request.method == "POST":
             form = UpdateBookingForm(request.form)
-            print(
-                request.form.get("travel_type"),
-                request.form.get("departure"),
-                request.form.get("arrival"),
-                request.form.get("departure_time"),
-            )
-
 
             # get location ids
             query = select(LocationTable). \
                 where(and_(LocationTable.name.in_(
-                    [form.departure_location.data, form.arrival_location.data]),
+                    [request.form.get("departure"), request.form.get("arrival")]),
                     LocationTable.is_deleted == False))
 
             locations = db_session.execute(statement=query).scalars().all()
@@ -408,8 +400,10 @@ def update_booking(
             query = select(TravelDetailTable).where(and_(
                 TravelDetailTable.departure_location_id == locations[0].id,
                 TravelDetailTable.arrival_location_id == locations[1].id,
-                TravelDetailTable.departure_time >= datetime.combine(form.departure_time.data, datetime.min.time()),
-                TravelDetailTable.departure_time <= datetime.combine(form.departure_time.data, datetime.max.time()),
+                TravelDetailTable.departure_time >= datetime.combine(datetime.strptime(
+                    request.form.get("departure_time"), "%Y-%m-%d"), datetime.min.time()),
+                TravelDetailTable.departure_time <= datetime.combine(datetime.strptime(
+                    request.form.get("departure_time"), "%Y-%m-%d"), datetime.max.time()),
                 TravelDetailTable.travel_type_id == travel_type.id,
                 TravelDetailTable.is_deleted == False))
 
@@ -422,6 +416,7 @@ def update_booking(
 
             # get expense
             query = select(ExpenseTable).where(and_(ExpenseTable.travel_detail_id == travel_detail.id,
+                                                    ExpenseTable.price_category_id == 1,
                                                     ExpenseTable.is_deleted == False))
 
             expense = db_session.execute(statement=query).scalar_one_or_none()
@@ -447,8 +442,12 @@ def update_booking(
             db_session.execute(statement=query)
             db_session.commit()
 
-            return ({"success": True, "message": "Booking updated successfully", "data": None},
-                    200, CONTENT_TYPE)
+            flash("Booking updated successfully")
+
+            if current_user.is_admin:
+                return redirect(url_for("dashboard.get_dashboard_admin"))
+
+            return redirect(url_for("dashboard.get_dashboard"))
 
     except IntegrityError as err:
         print("integrity error", err)
