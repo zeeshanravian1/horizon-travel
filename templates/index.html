@@ -88,7 +88,7 @@
 								{% endif %}
 
 
-								{% if current_user.is_admin and update_bookings is sameas true %}
+								{% if current_user.is_admin and homepage %}
 								<label for="users" class="form-label">Users:</label>
 								<select id="users" class="form-control" name="user" required>
 									{% for user in users %}
