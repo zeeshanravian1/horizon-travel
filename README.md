@@ -43,7 +43,7 @@ To configure pyenv you can follow this [tutorial](https://realpython.com/intro-t
 
 - Install mysql dependencies:
 ```
-sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+sudo apt-get install pkg-config python3-dev default-libmysqlclient-dev build-essential
 ```
 
 - Python Installation:
