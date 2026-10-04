@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container">
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="row">
+        <div class=" col-md-4 col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Journey Revenue</h5>
+              <div class="card card-style">
+                <div class="card-body ">
+                  {% for key, value in data.journey_revenue.items() %}
+                  <h6>{{ key }}: {{ value }}</h6>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class=" admin-dcard col-md-4 col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Monthly Revenue</h5>
+              <div class="card card-style">
+                <div class="card-body ">
+                  {% for key, value in data.monthly_revenue.items() %}
+                  <h6>{{ key }}: {{ value }}</h6>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-dcard col-md-4 col-lg-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">Top customers</h5>
+              {% for customer in data.top_customers %}
+              <div class="card card-style mb-2">
+                <div class="card-body ">
+                  <h6>Username : {{ customer.user_name }}</h6>
+                  <h6>Booking count : {{ customer.booking_count }}</h6>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+
+<div class="container">
+  <h1>Bookings</h1>
+  <div class="row le-hide">
+
+  </div>
+  <div class="row">
+
+    {% for booking in data.bookings %}
+
+    <div class="col-sm-12 col-lg-12 mt-2">
+      <div class="col-sm-12 col-lg-12 mt-2 mb-2">
+        <div class="m-0 row row-container bg-white p-3">
+          <div class="col-md-2 col-lg-2 col-sm-3 ">
+            <h5>{{ booking.user_name | capitalize }}</h5>
+          </div>
+          <div class="col-md-2 col-lg-2 col-sm-3 ">
+            <h5>{{ booking.class_type | capitalize }}</h5>
+          </div>
+          <div class="col-xl-3 col-md-3 col-sm-3 ">
+            <h5 class="">{{ booking.departure_location }}</h5>
+            <h6>{{ booking.departure_time }}</h6>
+          </div>
+          <div class="col-xl-3 col-sm-3  ">
+            <h5>{{ booking.arrival_location }}</h5>
+            <h6>{{ booking.arrival_time }}</h6>
+          </div>
+          <div class="col-xl-3 col-md-4 col-sm-3  d-flex">
+            <span class="spn-price ">cost</span>
+            <div class="col-2">
+
+              <h6>{{ booking.cost }}</h6>
+              
+            </div>
+            <a href="{{ url_for('GenerateReport.generate_report', booking_id=booking.booking_id) }}"
+            class="btn btn-sm admin-dwn-btn btn-primary">Download</a>
+            {% if booking.status == 'cancelled' %}
+            <a href="" class="btn btn-sm btn-danger dwn-btn disabled">Cancelled</a>
+
+            {% else %}
+            <a href="{{ url_for('BookingRouter.update_booking', booking_id=booking.booking_id) }}"
+              class="btn btn-sm btn-info dwn-btn">Update</a>
+            
+              {% if booking.status == 'cancelled' %}
+              <a href="#" class="btn btn-sm btn-danger dwn-btn disabled">Cancelled</a>
+              {% else %}
+              <a href="{{ url_for('BookingRouter.cancel_booking', booking_id=booking.booking_id) }}"
+              class="btn btn-sm btn-danger dwn-btn">Cancel</a>
+              {% endif %} 
+
+            {% endif %} 
+            
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script>
+	function updateArrivalOptions() {
+		// get the selected value from the departure dropdown
+		var departureValue = $('#from').val();
+
+		// loop through each option in the arrival dropdown
+		$('#to option').each(function () {
+			// if the option's value matches the selected value in the departure dropdown,
+			// remove the option from the dropdown
+			if ($(this).val() == departureValue) {
+				$(this).hide();
+			} else {
+				$(this).show();
+			}
+
+		});
+	}
+</script>
+<div class="container di mt-5">
+	<div class="row">
+		<div class="col-12">
+			{% if update_booking %}
+			<form action="{{ url_for('BookingRouter.update_booking', booking_id=booking_id) }}" method="post">
+
+				{% else%}
+				<form action="{{ url_for('Records.get_records') }}" method="post">
+					{% endif %}
+					<div class="">
+						<div class="radio-btn" required>
+
+							{% for travel_type in travel_types %}
+							<div class="form-check">
+								{% if response.travel_type == travel_type %}
+								<input name="travel_type" class="form-check-input" type="radio"
+									value="{{ travel_type }}" id="flexRadioDefault{{loop.index}}" checked>
+								{% else %}
+								<input name="travel_type" class="form-check-input" type="radio"
+									value="{{ travel_type }}" id="flexRadioDefault{{loop.index}}">
+								{% endif %}
+								<label class="form-check-label" for="flexRadioDefault{{loop.index}}">
+									{{ travel_type }}
+								</label>
+							</div>
+							{% endfor %}
+						</div>
+						<div class="row mb-4">
+
+							<div class="col">
+								<label class="form-label" for="From">From</label>
+								<select id="from" class="form-control" name="departure" required>
+
+									{% for location in departure_locations %}
+									{% if response.departure_locations == location %}
+
+									<option value="{{ location }}" selected>{{ location }}</option>
+									{% else %}
+									<option value="{{ location }}">{{ location }}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+
+								<label class="form-label" for="From">To</label>
+								<select id="to" class="form-control" name="arrival" required>
+									{% for location in arrival_locations %}
+									{% if response.arrival_locations == location %}
+
+									<option value="{{ location }}" selected>{{ location }}</option>
+									{% else %}
+									<option value="{{ location }}">{{ location }}</option>
+									{% endif %}
+									{% endfor %}
+									<script>
+										updateArrivalOptions();
+									</script>
+								</select>
+							</div>
+
+							<div class="col">
+								<label for="datePicker1" class="form-label">Departure Date:</label>
+								{% if response %}
+								<input type="date" class="form-control" id="datePicker1" name="departure_time" required
+									value="{{ response.departure_time }}">
+								{% else %}
+								<input type="date" class="form-control" id="datePicker1" name="departure_time" required>
+								{% endif %}
+
+
+								{% if current_user.is_admin and homepage %}
+								<label for="users" class="form-label">Users:</label>
+								<select id="users" class="form-control" name="user" required>
+									{% for user in users %}
+									<option value="{{ user.id }}">{{ user.name }}</option>
+									{% endfor %}
+								</select>
+								{% endif %}
+
+							</div>
+
+						</div>
+						<button class="btn btn-primary form-btn" type="submit">Search</button>
+
+					</div>
+				</form>
+		</div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		$('#from').change(updateArrivalOptions);
+	});
+
+	var radios = document.getElementsByName('travel_type');
+
+	var checked = false;
+
+	for (var i = 0, length = radios.length; i < length; i++) {
+		if (radios[i].checked) {
+			// do whatever you want with the checked radio
+			checked = true;
+
+			// only one radio can be logically checked, don't check the rest
+			break;
+		}
+	}
+
+	if (!checked) {
+		radios[0].checked = true;
+	}
+
+</script>
+{% endblock %}

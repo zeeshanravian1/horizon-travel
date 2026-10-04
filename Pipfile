@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+flask-login = "*"
+flask-wtf = "*"
+wtforms = "*"
+sqlalchemy = {extras = ["all"], version = "*"}
+sqlalchemy-serializer = "*"
+alembic = "*"
+mysqlclient = "*"
+environs = "*"
+pydantic = "*"
+passlib = "*"
+email-validator = "*"
+reportlab = "*"
+flask-toastr = "*"
+colorama = "*"
+
+[dev-packages]
+autopep8 = "*"
+ipykernel = "*"
+
+[requires]
+python_version = "3.11"

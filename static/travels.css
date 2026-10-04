@@ -1,0 +1,86 @@
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+}
+body{
+/*background-image: url('images/pexels-pixabay-104826.jpg');    */
+color: white;
+    
+}
+
+ 
+
+.row-container {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    cursor: pointer;
+    color:black;
+  }
+  
+  .row-container:hover {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  }
+  /* button {
+    position: relative;
+    bottom: 1px;
+  } */
+  .inp1{
+    width: 25%;
+    padding: 10px 20px;
+    margin: 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+    font-size: 18px;
+    
+  }
+ .label1{
+  margin: auto;
+  margin-left: 20px;
+ }
+
+ .form-btn{
+    padding: 12px 20px;
+    margin-bottom: 4px;
+    
+   
+ }
+.radio-btn {
+    display: flex;
+}
+.form-check{
+    margin-left: 50px;
+}
+
+
+/* .card{
+  color: black;
+
+}
+.card-style:hover{
+  
+    transform: scale(1.05); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) 
+  
+} */
+
+
+
+
+
+  @media screen and (max-width: 992px) {
+.travel-btn{
+    flex-direction: column;
+}
+  }
+ @media screen and (max-width: 576px) {
+    .travel-btn{
+        flex-direction: row;
+    }
+      }
+
+
+
+
+ 
+ 
