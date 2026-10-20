@@ -1,118 +1,166 @@
-# horizon-travel
-## Name
-Horizon Travels
+# Horizon Travels
 
-## Description
-This project is built in [Flask](https://flask.palletsprojects.com/) using python 3.11.
-You can also use [Alembic](https://alembic.sqlalchemy.org/en/latest/) for database migrations for this project.
+A [Flask](https://flask.palletsprojects.com/) web application that provides the routes for travel and travel-related activities. It is built with Python 3.11, stores its data in [MySQL](https://www.mysql.com/), and manages database migrations with [Alembic](https://alembic.sqlalchemy.org/en/latest/).
 
-This project contains all routes relating to travel and travel related activities.
+## Table of Contents
 
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Database Setup](#database-setup)
+- [Installation](#installation)
+- [Database Migrations](#database-migrations)
+- [Running the Application](#running-the-application)
 
-## MySQL Database
-This project uses [MySQL](https://www.mysql.com/) database for storing data.
+## Tech Stack
 
-- You can download MySQL by this command:
-```
-sudo apt install mysql-server
-```
+| Component       | Technology                                                   |
+| --------------- | ------------------------------------------------------------ |
+| Language        | Python 3.11                                                  |
+| Web framework   | [Flask](https://flask.palletsprojects.com/)                  |
+| Database        | [MySQL](https://www.mysql.com/)                              |
+| Migrations      | [Alembic](https://alembic.sqlalchemy.org/en/latest/)         |
+| Python versions | [pyenv](https://realpython.com/intro-to-pyenv/)              |
+| Environment     | [Pipenv](https://pipenv.pypa.io/)                            |
 
-- You can start MySQL server by this command:
-```
-sudo systemctl start mysql
-```
+## Prerequisites
 
-- Run MySQL shell by this command:
-```
-sudo mysql
-```
+- MySQL server
+- [pyenv](https://realpython.com/intro-to-pyenv/), configured as described in [this tutorial](https://realpython.com/intro-to-pyenv/)
+- Python 3.11 (pyenv will install it if it is missing)
+- Pipenv
+- MySQL client development libraries (see [Installation](#installation))
 
-- Change root password by this command:
-```
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password@123';
-```
+## Database Setup
 
-- Create database by this command:
-```
-CREATE DATABASE IF NOT EXISTS horizontravels_database;
-```
+1. Install MySQL (Ubuntu/Debian):
+
+   ```bash
+   sudo apt install mysql-server
+   ```
+
+2. Start the MySQL server:
+
+   ```bash
+   sudo systemctl start mysql
+   ```
+
+3. Open the MySQL shell:
+
+   ```bash
+   sudo mysql
+   ```
+
+4. Set the root password:
+
+   ```sql
+   ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Password@123';
+   ```
+
+   > **Note:** `Password@123` is an example for local development only. Use a strong password in any shared or production environment.
+
+5. Create the application database:
+
+   ```sql
+   CREATE DATABASE IF NOT EXISTS horizontravels_database;
+   ```
 
 ## Installation
-- Configure [Pyenv](https://realpython.com/intro-to-pyenv/):
-To configure pyenv you can follow this [tutorial](https://realpython.com/intro-to-pyenv/).
 
-- Install mysql dependencies:
-```
+### 1. Install MySQL client dependencies
+
+**Ubuntu/Debian:**
+
+```bash
 sudo apt-get install pkg-config python3-dev default-libmysqlclient-dev build-essential
 ```
 
-- Python Installation:
-To run project, you must have python 3.11 installed on your system.
-If python 3.11 is not installed pyenv will install it for you as you have already configured pyenv.
+**macOS:**
 
-- Change Global Python Version:
+```bash
+brew install pkg-config mysql-client
 ```
+
+On macOS, also add `mysql-client` to your `pkg-config` path by adding it to your shell configuration file (e.g. `~/.zshrc` or `~/.bashrc`):
+
+```bash
+echo 'export PKG_CONFIG_PATH="$(brew --prefix)/opt/mysql-client/lib/pkgconfig"' >> ~/.zshrc
+```
+
+### 2. Set the Python version
+
+With pyenv configured, set Python 3.11 as the global version:
+
+```bash
 pyenv global 3.11.0
 ```
 
-- Pipenv Installation:
-After that, you need to install pipenv to handle virtual environments, you can install it by typing this command in your terminal:
-```
-pip install pipenv or
+### 3. Install Pipenv
+
+Pipenv manages the project's virtual environment:
+
+```bash
+pip install pipenv
+# or
 pip3 install pipenv
 ```
 
-Adding pipenv to path
-```
+Add Pipenv to your `PATH` (replace `<user>` with your username):
+
+```bash
 echo 'export PATH="/home/<user>/.local/bin:$PATH"' >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-Verify your pipenv installation:
-```
+Verify the installation:
+
+```bash
 pipenv
 ```
 
-- Creating Virtual Environment
-Go to project directory and type following command in terminal.
-```
+### 4. Create the virtual environment
+
+From the project root, create the virtual environment and install all dependencies:
+
+```bash
 pipenv sync
 ```
 
-This will create a virtual environment for your project along with dependencies.
+### 5. Activate the virtual environment
 
-- Activate Virtual Environment
-To active virtual environment type following command in terminal.
-```
+```bash
 pipenv shell
 ```
 
-You can verify your environment dependencies by running:
-```
+Optionally, confirm the installed dependencies:
+
+```bash
 pip list
 ```
 
-## Configure [Alembic](https://alembic.sqlalchemy.org/en/latest/) for Database Migrations.
-- Type following command to initialize migrations
-```
+## Database Migrations
+
+The `migrations` folder is already included in this project, so you do **not** need to run `alembic init` or edit `migrations/env.py` to set the database path. For reference, a new Alembic setup is initialized with:
+
+```bash
 alembic init migrations
 ```
-We have already added migrations folder to project, you can skip above step.
-- Edit env.py in migrations folder to set path for your database:
-We have already added migrations folder to project, you can skip above step.
 
-- Your first migrations
-```
+Generate a migration after changing the models:
+
+```bash
 alembic revision --autogenerate -m "<Migration Name>"
 ```
 
-- Apply Migrations
-```
+Apply all pending migrations:
+
+```bash
 alembic upgrade heads
 ```
 
-## Running Project
-- Run Project
-```
+## Running the Application
+
+Start the development server with debug mode enabled:
+
+```bash
 flask --app main.py --debug run
 ```
